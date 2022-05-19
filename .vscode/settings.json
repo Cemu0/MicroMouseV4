@@ -1,0 +1,21 @@
+{
+    "files.associations": {
+        "*.pde": "pde",
+        "esp32-hal-bt.c": "cpp",
+        "functional": "cpp",
+        "cmath": "cpp",
+        "*.tcc": "cpp",
+        "ctime": "cpp",
+        "iomanip": "cpp",
+        "limits": "cpp",
+        "numeric": "cpp",
+        "streambuf": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp"
+    },
+    "cSpell.words": [
+        "dsgf",
+        "ssid"
+    ]
+}
