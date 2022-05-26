@@ -4,7 +4,7 @@
 #include "driver/adc.h"
 
 // long LED_WARMUP_TIME = 5;
-#define LED_WARMUP_TIME 60
+#define LED_WARMUP_TIME 80
 #define LED_COOLDOWN_TIME 5
 
 #define PREVENT_ZERO(val) val>=0?val:0

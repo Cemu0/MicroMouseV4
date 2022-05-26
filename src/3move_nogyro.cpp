@@ -84,6 +84,7 @@ long left;
 long right;
 unsigned long calculate_timer = 0;
 unsigned long LOG_timer = 0;
+
 void loop(){
     digitalWrite(2,LOW);
     entry = micros();
@@ -150,9 +151,9 @@ void loop(){
             // no right wall and able to turn right
             else if(faceSensorValue5 < 2500){
                 if(fw_speed != 0){
-                    if(rt_speed != 15){
+                    if(rt_speed != 35){
                         TelnetStream.println("rotating right...");
-                        rt_speed = 15;
+                        rt_speed = 35;
                     }
                 }
             }

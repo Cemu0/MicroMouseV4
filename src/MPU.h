@@ -18,12 +18,12 @@ uint8_t fifoBuffer[64]; // FIFO storage buffer
 Quaternion q;           // [w, x, y, z]         quaternion container
 VectorFloat gravity;    // [x, y, z]            gravity vector
 float ypr[3];   
+float delta;
 
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
 void ICACHE_RAM_ATTR dmpDataReady() {
     mpuInterrupt = true;
 }
-
 
 uint8_t setupMPU(){
     Wire.begin();
@@ -40,20 +40,39 @@ uint8_t setupMPU(){
 
         //using the calibrated value
 
-        mpu.setXAccelOffset(-318); 
-        mpu.setYAccelOffset(1365); 
-        mpu.setZAccelOffset(1822); 
-        mpu.setXGyroOffset(46);
-        mpu.setYGyroOffset(-15);
-        mpu.setZGyroOffset(12);
+        // mpu.setXAccelOffset(-318); 
+        // mpu.setYAccelOffset(1365); 
+        // mpu.setZAccelOffset(1822); 
+        // mpu.setXGyroOffset(46);
+        // mpu.setYGyroOffset(-15);
+        // mpu.setZGyroOffset(12);
 
         // enable this to calibrate
-        // mpu.CalibrateAccel(6);
-        // mpu.CalibrateGyro(6);
+        mpu.CalibrateAccel(10);
+        mpu.CalibrateGyro(12);
         // enable this to print the calibrated value
-        // mpu.PrintActiveOffsets();
+        mpu.PrintActiveOffsets();
 
         return true;
+    }
+}
+
+float offsetYaw(float offset){
+    delta = ypr[0] - offset;
+    if(offset >= 0){
+        // if(delta <= -180.0)
+        //     return 360.0 + delta;
+        if(delta <= -PI)
+            return PI*2.0 + delta;
+        else    
+            return delta;
+    }
+    else{
+        // if(delta >= 180.0)
+        if(delta >= PI)
+            return  ypr[0] + offset;
+        else
+            return delta;
     }
 }
 
