@@ -60,18 +60,20 @@ void readIRsensor(){
     // digitalWrite(SENSOR_ACTIVATE_GROUP_B,LOW);
 
     digitalWrite(SENSOR_ACTIVATE_GROUP_C,HIGH);
+    delayMicroseconds(LED_WARMUP_TIME); // 100uS
+    faceSensorValue3 = PREVENT_ZERO(thread_value3-analogRead(SENSOR_PIN_3));
+
+    digitalWrite(SENSOR_ACTIVATE_GROUP_C,LOW);
     digitalWrite(SENSOR_ACTIVATE_GROUP_A,HIGH);
     delayMicroseconds(LED_WARMUP_TIME); // 100uS
     faceSensorValue5 = PREVENT_ZERO(thread_value5-analogRead(SENSOR_PIN_5));
-    faceSensorValue3 = PREVENT_ZERO(thread_value3-analogRead(SENSOR_PIN_3));
     faceSensorValue1 = PREVENT_ZERO(thread_value1-analogRead(SENSOR_PIN_1));
-    digitalWrite(SENSOR_ACTIVATE_GROUP_C,LOW);
+    digitalWrite(SENSOR_ACTIVATE_GROUP_A,LOW);
 
     //damn the internal capacitor between sensor 1 and sensor 2 require at least 3 millisecond to cooldown => using 1 or 2 only 
     // delay(3);
     // delayMicroseconds(LED_WARMUP_TIME);
     // faceSensorValue1 = (thread_value1-analogRead(SENSOR_PIN_1));
-    digitalWrite(SENSOR_ACTIVATE_GROUP_A,LOW);
 
     // digitalWrite(SENSOR_ACTIVATE_GROUP_A,HIGH);
     digitalWrite(SENSOR_ACTIVATE_GROUP_B,HIGH);
@@ -87,6 +89,8 @@ void readIRsensor(){
 
     // digitalWrite(SENSOR_ACTIVATE_GROUP_A,LOW);
     digitalWrite(SENSOR_ACTIVATE_GROUP_B,LOW);
+    delayMicroseconds(LED_WARMUP_TIME); // too much time !
+
     // digitalWrite(SENSOR_ACTIVATE_GROUP_C,LOW);
 
 }

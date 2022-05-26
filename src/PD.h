@@ -1,11 +1,11 @@
 
 #define P 1
 #define D 1
-
-#define hasLeftWall 2000
-#define hasRightWall 2000
-#define leftMiddleValue 4000
-#define rightMiddleValue 4000
+//for 1 and 5
+#define hasLeftWall 1800
+#define hasRightWall 1700
+#define leftMiddleValue 3500
+#define rightMiddleValue  3400
 
 long errorP = 0;
 long errorD = 0;

@@ -28,6 +28,7 @@ int64_t oldCountA = 0;
 int64_t oldCountB = 0;
 
 float offset_angle = 0;
+float E_ratio = 50;
 
 #define FILTER 5
 
@@ -96,7 +97,6 @@ long rt_speed = 0;
 long left;
 long right;
 float target_angle;
-float E_ratio = 50;
 float speed;
 
 byte debug = 0;
@@ -104,6 +104,9 @@ byte debug = 0;
 #define RIGHT PI/2.0
 #define LEFT -PI/2.0
 #define BACKWARD PI
+
+#define TO_RADIAN(n) (n  * PI) / 180.0
+#define TO_DEG(n) n * (180/PI)
 
 #define TURNING_TIME 500
 
@@ -115,11 +118,11 @@ void turn(float angle){
 
     //convert rotation from 270 to -90
     if(offset_angle > PI)
-        offset_angle -= (3.0/2.0) * PI;
+        offset_angle -= 2 * PI;
 
     //convert rotation from -270 to 90
     else if(offset_angle < -PI)
-        offset_angle += (3.0/2.0) * PI;
+        offset_angle += 2 * PI;
 
 }
 bool turning(){
@@ -150,16 +153,16 @@ void loop(){
                 targetSpeed = data.substring(1).toInt();
                 move_enable = true;
                 break;
+            case 'S':
             case 's':
                 TelnetStream.println("STOP");
                 targetSpeed = 0;
                 rt_speed = 0;
                 move_enable = false;  
-                MotorControl.motorStop(1);
-                MotorControl.motorStop(0);  
+                MotorControl.motorsStop();
                 break;
             case 'C':
-                offset_angle = (data.substring(1).toFloat()  * PI) / 180.0;
+                offset_angle = TO_RADIAN(data.substring(1).toFloat());
                 TelnetStream.println("TURNING...");
                 break;
 
@@ -237,48 +240,42 @@ void loop(){
     //run every millisecond
     // if(millis() != calculate_timer){
 
-        // if(faceSensorValue3 > 4000){ // NEARLY HIT THE WALL 
-        //     if(targetSpeed != 0){
-        //         TelnetStream.println("STOP");
-        //         targetSpeed = 0;
-        //         // move_enable = false;
-        //         // rt_speed = -45;
-        //     }
-        // }
+        if(faceSensorValue3 > 4000){ // NEARLY HIT THE WALL 
+            if(targetSpeed != 0){
+                TelnetStream.println("EMERG_STOP");
+                move_enable = false;  
+                targetSpeed = 0;
+                MotorControl.motorsStop();
 
-        // if(faceSensorValue3 > 1600 && !turning()){ // turn
-        //     if(targetSpeed != 0){
-        //         // TelnetStream.println("STOP");
-        //         // fw_speed = 0;
-        //         // move_enable = false;
-        //         // rt_speed = -45;
-        //         if(faceSensorValue4 < 2100){ // turn right
-        //             TelnetStream.println("Turn right");
-        //             turn(RIGHT);
-        //         }
-        //         // offset_angle += (PI/2.0);
-        //     }
-        // }
-        // else if (faceSensorValue3 < 2000) {
-        //     if(move_enable){
-        //         fw_speed = 30;
-        //     }
-        //     //forward both wall
-        //     if(faceSensorValue5 > 2500 && faceSensorValue1 > 2500){
-        //     //     if(fw_speed != 0)
-        //             rt_speed = (faceSensorValue1 - faceSensorValue5 - 0) / 100;
-        //     }
-        //     // no right wall and able to turn right
-        //     else if(faceSensorValue5 < 2500){
-        //         if(fw_speed != 0){
-        //             if(rt_speed != 15){
-        //                 TelnetStream.println("rotating right...");
-        //                 rt_speed = 15;
-        //             }
-        //         }
-        //     }
-        // }
+                // move_enable = false;
+                // rt_speed = -45;
+            }
+        }
 
+        if(faceSensorValue3 > 1700 && !turning()){ // turn 1700
+            if(targetSpeed != 0){
+                TelnetStream.println("APPROACH EDGE");
+                // fw_speed = 0;
+                // move_enable = false;
+                // rt_speed = -45;
+                if(faceSensorValue4 < hasRightWall){ // turn right
+                    TelnetStream.print(TO_DEG(ypr[0]));
+                    TelnetStream.print(" ");
+                    TelnetStream.print(TO_DEG(offset_angle));
+                    TelnetStream.print(" ");
+                    turn(RIGHT);
+                    TelnetStream.print(TO_DEG(offset_angle));
+                    TelnetStream.println("Turn right");
+                }else{
+                    TelnetStream.println("EMERG_STOP");
+                    move_enable = false;  
+                    targetSpeed = 0;
+                    MotorControl.motorsStop();
+
+                }
+                // offset_angle += (PI/2.0);
+            }
+        }
 
 
         target_angle = - offsetYaw(offset_angle)*E_ratio;
@@ -296,6 +293,38 @@ void loop(){
             rt_speed = target_angle;
 
 
+ 
+        if(move_enable && !turning()){
+                if(faceSensorValue5 > hasRightWall && faceSensorValue1 > hasLeftWall){
+                    if(fw_speed != 0){
+                        float offset = (faceSensorValue1 - faceSensorValue5) / 1000000.0;
+                        
+                        // turn(0);
+                        // float offset = (faceSensorValue1 - faceSensorValue5) / 1000.0;
+                        if(abs(offset) > 0.00173599){
+                            TelnetStream.print("osw");
+                            TelnetStream.println(TO_DEG(offset));
+                            offset_angle += offset;
+                            // rt_speed += offset;
+                        }
+                        // else
+                        //     TelnetStream.println(TO_DEG(offset));
+                    }
+                }
+                // else if((faceSensorValue1 > leftMiddleValue))// nearly touch the wall
+                // {
+                //     float offset = (leftMiddleValue - faceSensorValue1) / 100000.0;
+                //     TelnetStream.print("slight right");
+                //     TelnetStream.println(TO_DEG(offset));
+                //     offset_angle -= offset;
+                // }else if((faceSensorValue5 > rightMiddleValue))// nearly touch the wall
+                // {
+                //     float offset = (rightMiddleValue - faceSensorValue5) / 100000.0;
+                //     TelnetStream.print("slight left");
+                //     TelnetStream.println(TO_DEG(offset));
+                //     offset_angle += offset;
+                // }
+        }
 
         fw_speed = (fw_speed*7 + targetSpeed) / 8;
         // fw_speed = targetSpeed;
@@ -309,26 +338,25 @@ void loop(){
     // }
         if(move_enable){
             if(left > 0){
-                // left += 40;
+                // left += E_ratio; //-2 ok but lag
                 MotorControl.motorForward(1, left);
             }else{
-                // left -= 40;
+                // left -= E_ratio;
                 MotorControl.motorReverse(1, -left);
             }
             
             if(right > 0){
-                // right += 40;
+                // right += E_ratio;
                 MotorControl.motorForward(0, right);
             }else{
-                // right -= 40;
+                // right -= E_ratio;
                 MotorControl.motorReverse(0, -right);
             }
         }
     }
     
 
-    if(millis() - LOG_timer > 500){
-    //     TelnetStream.print(micros()-entry); 
+    if(millis() - LOG_timer > 100){
     //     TelnetStream.print(" ");
     //     TelnetStream.print(speedA);
     //     TelnetStream.print(" ");
@@ -355,8 +383,10 @@ void loop(){
         // TelnetStream.print(ypr[0] * 180/M_PI);
         // TelnetStream.print(" ");
         // TelnetStream.print(offsetYaw(offset_angle)* 180/M_PI);
-        if(debug == 1)
+        if(debug == 1){
+            TelnetStream.print(micros()-entry); 
             printIR(TelnetStream);
+        }
 
         // Serial.print(" ");
         // Serial.print(speedA);
@@ -371,7 +401,7 @@ void loop(){
         // printIR(Serial);
 
         // printIR(Serial);
-    //     LOG_timer = millis();
+        LOG_timer = millis();
     }
 
 
