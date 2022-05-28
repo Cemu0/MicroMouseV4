@@ -252,7 +252,7 @@ void loop(){
             }
         }
 
-        if(faceSensorValue3 > 1700 && !turning()){ // turn 1700
+        if(faceSensorValue3 > 1400 && !turning()){ // turn 1700
             if(targetSpeed != 0){
                 TelnetStream.println("APPROACH EDGE");
                 // fw_speed = 0;
@@ -293,38 +293,39 @@ void loop(){
             rt_speed = target_angle;
 
 
- 
-        if(move_enable && !turning()){
-                if(faceSensorValue5 > hasRightWall && faceSensorValue1 > hasLeftWall){
-                    if(fw_speed != 0){
-                        float offset = (faceSensorValue1 - faceSensorValue5) / 1000000.0;
+    //should turn off for more accuracy -_-
+        // if(move_enable && !turning()){
+        //         if(faceSensorValue5 > hasRightWall && faceSensorValue1 > hasLeftWall){
+        //             if(fw_speed != 0){
+        //                 // float offset = (faceSensorValue1 - faceSensorValue5) / 10000000.0;
                         
-                        // turn(0);
-                        // float offset = (faceSensorValue1 - faceSensorValue5) / 1000.0;
-                        if(abs(offset) > 0.00173599){
-                            TelnetStream.print("osw");
-                            TelnetStream.println(TO_DEG(offset));
-                            offset_angle += offset;
-                            // rt_speed += offset;
-                        }
-                        // else
-                        //     TelnetStream.println(TO_DEG(offset));
-                    }
-                }
-                // else if((faceSensorValue1 > leftMiddleValue))// nearly touch the wall
-                // {
-                //     float offset = (leftMiddleValue - faceSensorValue1) / 100000.0;
-                //     TelnetStream.print("slight right");
-                //     TelnetStream.println(TO_DEG(offset));
-                //     offset_angle -= offset;
-                // }else if((faceSensorValue5 > rightMiddleValue))// nearly touch the wall
-                // {
-                //     float offset = (rightMiddleValue - faceSensorValue5) / 100000.0;
-                //     TelnetStream.print("slight left");
-                //     TelnetStream.println(TO_DEG(offset));
-                //     offset_angle += offset;
-                // }
-        }
+        //                 // turn(0);
+        //                 // float offset = (faceSensorValue1 - faceSensorValue5) / 1000.0;
+        //                 // if(abs(offset) > 0.00093599){
+        //                 //     TelnetStream.print("osw");
+        //                 //     // TelnetStream.println(TO_DEG(offset));
+        //                 //     // offset_angle += offset;
+        //                 //     rt_speed += offset;
+        //                 // }
+        //                 // else
+        //                 //     TelnetStream.println(TO_DEG(offset));
+        //             }
+        //         }
+        // }
+        //         // else if((faceSensorValue1 > leftMiddleValue))// nearly touch the wall
+        //         // {
+        //         //     float offset = (leftMiddleValue - faceSensorValue1) / 100000.0;
+        //         //     TelnetStream.print("slight right");
+        //         //     TelnetStream.println(TO_DEG(offset));
+        //         //     offset_angle -= offset;
+        //         // }else if((faceSensorValue5 > rightMiddleValue))// nearly touch the wall
+        //         // {
+        //         //     float offset = (rightMiddleValue - faceSensorValue5) / 100000.0;
+        //         //     TelnetStream.print("slight left");
+        //         //     TelnetStream.println(TO_DEG(offset));
+        //         //     offset_angle += offset;
+        //         // }
+        // }
 
         fw_speed = (fw_speed*7 + targetSpeed) / 8;
         // fw_speed = targetSpeed;
