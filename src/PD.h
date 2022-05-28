@@ -44,16 +44,16 @@ long PID_SENSOR_FORWARD(long &leftSensor, long &rightSensor)
 
 
 
-float P_speed = 7;
-float D_speed = 4;
+float P_speed = 0.7;
+float D_speed = 0.4;
 
 //FOR ROTATE USING ENCODER
 // #define P_rotation 2.5
 // #define D_rotation 7.0
 
 //FOR ROTATE USING GYRO
-float P_rotation = 2.5;
-float D_rotation = 7.3;
+float P_rotation = 0.25;
+float D_rotation = 0.73;
 
 // float P_rotation = 0.5;
 // float D_rotation = 0;

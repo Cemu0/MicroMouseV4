@@ -1,4 +1,4 @@
-#ifdef RIGHT_HAND_GYRO
+#ifdef MAIN
 #include "system_def.h"
 #include "OTA.h"
 #include "MPU.h"
@@ -21,29 +21,40 @@ bool move_enable = false;
 
 long targetSpeed = 0;
 
-long speedA = 0;
-long speedB = 0;
+float speedA = 0;
+float speedB = 0;
+
+float a_ratio = 30.5;
 
 int64_t oldCountA = 0;
 int64_t oldCountB = 0;
 
 float offset_angle = 0;
-float E_ratio = 50;
+float E_ratio = 500;
 
-#define FILTER 5
+#define FILTER 7
 
 unsigned long speed_timer = 0;
+unsigned long acc_timer = 0;
 bool speedCalculate(){
-    auto detatime = millis() - speed_timer;
-    if( detatime >= 10){ // THIS SHOULD BE FASTER IF YOU PLAN TO RUN FAST
-        speedA = ((encoderA.getCount() - oldCountA) + speedA*FILTER)/(FILTER+1);
-        speedB = ((encoderB.getCount() - oldCountB) + speedB*FILTER)/(FILTER+1);
+    auto deltaTime = millis() - speed_timer;
+    auto deltaTimeb = micros() - acc_timer;
+    if( deltaTime >= 5){ // THIS SHOULD BE FASTER IF YOU PLAN TO RUN FAST
+        //convert to mm/s 
+        // float tmpSpeedA = ((float)(encoderA.getCount() - oldCountA) / (deltaTimeb / 1000000.0)) * (a_ratio * PI) / (30 * (50/10) * 4);
+        float tmpSpeedA = ((float)(encoderA.getCount() - oldCountA) / (deltaTimeb / 1000000.0)) * MM_PP_A;
+        float tmpSpeedB = ((float)(encoderB.getCount() - oldCountB) / (deltaTimeb / 1000000.0)) * MM_PP_B;
+
+        //using a simple filter due to encoder low accuracy  
+        speedA = (tmpSpeedA + speedA*FILTER)/(FILTER+1);
+        speedB = (tmpSpeedB + speedB*FILTER)/(FILTER+1);
 
         // speedA = encoderA.getCount() - oldCountA;
         // speedB = encoderB.getCount() - oldCountB;
         oldCountA = encoderA.getCount();
         oldCountB = encoderB.getCount();
         speed_timer = millis();
+        acc_timer = micros();
         return true;
     }
     return false;
@@ -196,6 +207,11 @@ void loop(){
                 TelnetStream.println("CHANGED");
                 break;
 
+            case 'a':
+                a_ratio = data.substring(1).toFloat();
+                TelnetStream.println("CHANGED");
+                break;
+
             case 'm':
                 speed = data.substring(1).toFloat();
                 if(speed > 0){
@@ -331,7 +347,7 @@ void loop(){
         // fw_speed = targetSpeed;
 
         
-        PD_SPEED_ANGULAR(fw_speed, rt_speed, (speedA - speedB) * 2, (speedA + speedB) / 2, left, right);
+        PD_SPEED_ANGULAR(fw_speed, rt_speed, ((speedA - speedB) * 2), (speedA + speedB) / 2, left, right);
         // PD_SPEED_ANGULAR(fw_speed, rt_speed, (long)(target_angle), 0, left, right);
         // PD_SPEED_ANGULAR(fw_speed, (long)(target_angle), (speedA - speedB) * 2, (speedA + speedB) / 2, left, right);
         // PD_SPEED_ANGULAR(fw_speed, rt_speed, (long)(ypr[0] * 5), (speedA + speedB) / 2, left, right);
@@ -358,14 +374,16 @@ void loop(){
     
 
     if(millis() - LOG_timer > 100){
-    //     TelnetStream.print(" ");
-    //     TelnetStream.print(speedA);
-    //     TelnetStream.print(" ");
-    //     TelnetStream.print(speedB);
-    //     TelnetStream.print(" ");
-    //     TelnetStream.print(encoderA.getCount());
-    //     TelnetStream.print(" ");
-    //     TelnetStream.println(encoderB.getCount());
+        if(debug == 1){
+            TelnetStream.print(" ");
+            TelnetStream.print(speedA);
+            TelnetStream.print(" ");
+            TelnetStream.print(speedB);
+            TelnetStream.print(" ");
+            TelnetStream.print(encoderA.getCount());
+            TelnetStream.print(" ");
+            TelnetStream.println(encoderB.getCount());
+        }
         // TelnetStream.print(" ");
         // TelnetStream.print(left);
         // TelnetStream.print(" ");
@@ -377,14 +395,17 @@ void loop(){
         // TelnetStream.print(" ");
         // TelnetStream.print(D_speed);
         // TelnetStream.print(" ");
-        // TelnetStream.print(target_angle);
-        // TelnetStream.print(" ");
-        // TelnetStream.print(offset_angle * 180/M_PI);
-        // TelnetStream.print(" ");
-        // TelnetStream.print(ypr[0] * 180/M_PI);
-        // TelnetStream.print(" ");
-        // TelnetStream.print(offsetYaw(offset_angle)* 180/M_PI);
-        if(debug == 1){
+        if(debug == 2){
+            TelnetStream.print(target_angle);
+            TelnetStream.print(" ");
+            TelnetStream.print(offset_angle * 180/M_PI);
+            TelnetStream.print(" ");
+            TelnetStream.print(ypr[0] * 180/M_PI);
+            TelnetStream.print(" ");
+            TelnetStream.println(offsetYaw(offset_angle)* 180/M_PI);
+        }
+
+        if(debug == 5){
             TelnetStream.print(micros()-entry); 
             printIR(TelnetStream);
         }

@@ -1,6 +1,6 @@
 #pragma once
 #include <Arduino.h>
-#include "pinDefine.h"
+#include "system_def.h"
 #include "driver/adc.h"
 
 // long LED_WARMUP_TIME = 5;

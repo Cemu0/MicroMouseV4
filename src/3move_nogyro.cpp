@@ -1,5 +1,5 @@
 #ifdef MOVE_GENERAL
-#include "pinDefine.h"
+#include "system_def.h"
 #include "OTA.h"
 #include "MPU.h"
 #include "PD.h"

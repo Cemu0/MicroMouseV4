@@ -40,5 +40,8 @@
 #define     MB_EC1     18
 #define     MB_EC2     19
 
-//pulse per one rotation, encoder , main gear / second gear
-#define RATIO 30 * (50/10) * 4
+//radius depend on mouse !
+// radius / pulse per one rotation, encoder , main gear / second gear
+// mm per pulse
+#define MM_PP_A  ((32.1 * PI) / (30 * (50/10) * 4))
+#define MM_PP_B  ((31.5 * PI) / (30 * (50/10) * 4))
