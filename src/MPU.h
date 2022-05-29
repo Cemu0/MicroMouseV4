@@ -67,10 +67,10 @@ float offsetYaw(float offset){
         else    
             return delta;
     }
-    else{
+    else{   
         // if(delta >= 180.0)
         if(delta >= PI)
-            return  ypr[0] + offset;
+            return  - PI*2.0 + delta;
         else
             return delta;
     }

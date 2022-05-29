@@ -2,8 +2,9 @@
 #define P 1
 #define D 1
 //for 1 and 5
-#define hasLeftWall 1800
-#define hasRightWall 1700
+long hasFrontWall = 1900;
+long hasLeftWall = 2000;
+long hasRightWall = 1600;
 #define leftMiddleValue 3500
 #define rightMiddleValue  3400
 
@@ -51,10 +52,20 @@ float D_speed = 0.4;
 // #define P_rotation 2.5
 // #define D_rotation 7.0
 
-//FOR ROTATE USING GYRO
+//FOR corner ROTATE USING GYRO
 float P_rotation = 0.25;
 float D_rotation = 0.73;
 
+//for rotating at position
+void setRotatingValue(){
+    P_rotation = 1.25;
+    D_rotation = 2.33;
+}
+
+void setForwardValue(){
+    P_rotation = 0.25;
+    D_rotation = 0.73;
+}
 // float P_rotation = 0.5;
 // float D_rotation = 0;
 

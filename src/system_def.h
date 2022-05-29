@@ -43,5 +43,5 @@
 //radius depend on mouse !
 // radius / pulse per one rotation, encoder , main gear / second gear
 // mm per pulse
-#define MM_PP_A  ((32.1 * PI) / (30 * (50/10) * 4))
+#define MM_PP_A  ((32.15 * PI) / (30 * (50/10) * 4))
 #define MM_PP_B  ((31.5 * PI) / (30 * (50/10) * 4))

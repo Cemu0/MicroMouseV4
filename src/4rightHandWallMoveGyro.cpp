@@ -263,9 +263,9 @@ void loop(){
                     TelnetStream.print(" ");
                     TelnetStream.print(TO_DEG(offset_angle));
                     TelnetStream.print(" ");
-                    turn(RIGHT);
+                    turn(LEFT);
                     TelnetStream.print(TO_DEG(offset_angle));
-                    TelnetStream.println("Turn right");
+                    TelnetStream.println("Turn LEFT");
                 }else{
                     TelnetStream.println("EMERG_STOP");
                     move_enable = false;  

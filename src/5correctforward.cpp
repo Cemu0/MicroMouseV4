@@ -30,7 +30,7 @@ int64_t oldCountA = 0;
 int64_t oldCountB = 0;
 
 float offset_angle = 0;
-float E_ratio = 500;
+float E_ratio = 700;
 
 #define FILTER 7
 
@@ -129,11 +129,11 @@ void turn(float angle){
 
     //convert rotation from 270 to -90
     if(offset_angle > PI)
-        offset_angle -= 2 * PI;
+        offset_angle -= 2.0  * PI;
 
     //convert rotation from -270 to 90
-    else if(offset_angle < -PI)
-        offset_angle += 2 * PI;
+    else if(offset_angle <= -PI)
+        offset_angle += 2.0 * PI;
 
 }
 bool turning(){
@@ -224,6 +224,21 @@ void loop(){
                 TelnetStream.println("moving");
                 break;
 
+            case 'f':
+                hasFrontWall = data.substring(1).toInt();
+                TelnetStream.println("CHANGED");
+                break;
+
+            case 'l':
+                hasLeftWall = data.substring(1).toInt();
+                TelnetStream.println("CHANGED");
+                break;
+
+            case 'r':
+                hasRightWall = data.substring(1).toInt();
+                TelnetStream.println("CHANGED");
+                break;
+
             case 'b':
                 debug = data.substring(1).toInt();
                 break;
@@ -256,19 +271,19 @@ void loop(){
     //run every millisecond
     // if(millis() != calculate_timer){
 
-        if(faceSensorValue3 > 4000){ // NEARLY HIT THE WALL 
+        if(faceSensorValue3 > 3500 && move_enable){ // NEARLY HIT THE WALL 
             if(targetSpeed != 0){
                 TelnetStream.println("EMERG_STOP");
                 move_enable = false;  
                 targetSpeed = 0;
                 MotorControl.motorsStop();
-
                 // move_enable = false;
                 // rt_speed = -45;
             }
         }
 
-        if(faceSensorValue3 > 1400 && !turning()){ // turn 1700
+        if(faceSensorValue3 > hasFrontWall && !turning() && move_enable){ // turn 1700
+        // if(!turning()){ // turn 1700
             if(targetSpeed != 0){
                 TelnetStream.println("APPROACH EDGE");
                 // fw_speed = 0;
@@ -281,29 +296,42 @@ void loop(){
                     TelnetStream.print(" ");
                     turn(RIGHT);
                     TelnetStream.print(TO_DEG(offset_angle));
-                    TelnetStream.println("Turn right");
+                    TelnetStream.println("Turn RIGHT");
+                } else if(faceSensorValue2 < hasLeftWall){ // turn right
+                    TelnetStream.print(TO_DEG(ypr[0]));
+                    TelnetStream.print(" ");
+                    TelnetStream.print(TO_DEG(offset_angle));
+                    TelnetStream.print(" ");
+                    turn(LEFT);
+                    TelnetStream.print(TO_DEG(offset_angle));
+                    TelnetStream.println("Turn LEFT");
                 }else{
-                    TelnetStream.println("EMERG_STOP");
-                    move_enable = false;  
+                    setRotatingValue();
+                    turn(BACKWARD);
                     targetSpeed = 0;
-                    MotorControl.motorsStop();
+                    TelnetStream.println("ROTATE");
+                    // MotorControl.motorsStop();
+                    // move_enable = false;  
 
                 }
                 // offset_angle += (PI/2.0);
-            }
+            } 
+        } else if (move_enable && !turning()) {
+            setForwardValue();
+            targetSpeed = 200;
         }
 
 
-        target_angle = - offsetYaw(offset_angle)*E_ratio;
+        target_angle = - offsetYaw(offset_angle) * E_ratio;
         
-        if(abs(target_angle) < 10 && speedA + speedB > 4)
+        if(abs(target_angle) < 100 && speedA + speedB > 40)
             rt_speed = 0;
 
-        else if(abs(target_angle) > 70){
+        else if(abs(target_angle) > 700){
             if(target_angle>0)
-                rt_speed = 70;
+                rt_speed = 700;
             else    
-                rt_speed = -70;
+                rt_speed = -700;
         }
         else   
             rt_speed = target_angle;
