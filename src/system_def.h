@@ -1,5 +1,6 @@
 #pragma once
 
+#define     BOOT_BUTTON     0
 #define     LED_PIN         2
 #define     BUZZ_PIN         12
 
@@ -9,6 +10,7 @@
 #define     SENSOR_PIN_3      34
 #define     SENSOR_PIN_4      35
 #define     SENSOR_PIN_5      32
+#define     BATTERY_SENSOR      33
 
 
 //LED 1 5

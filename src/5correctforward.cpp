@@ -63,25 +63,25 @@ bool speedCalculate(){
 void setup(){
     MotorControl.attachMotors(BIN2_PIN, BIN1_PIN, AIN2_PIN, AIN1_PIN);
     MotorControl.motorsStop();
-    pinMode(12,OUTPUT);
-    tone(12,1000);
+    pinMode(BUZZ_PIN,OUTPUT);
+    tone(BUZZ_PIN,1000);
 
     ESP32Encoder::useInternalWeakPullResistors=UP;
     encoderA.attachFullQuad(MA_EC2, MA_EC1);
     encoderB.attachFullQuad(MB_EC1, MB_EC2);
 
-    pinMode(2,OUTPUT);
-    digitalWrite(2,LOW);
+    pinMode(LED_PIN,OUTPUT);
+    digitalWrite(LED_PIN,LOW);
     initIR();
     delay(100);
-    tone(12,0);
+    tone(BUZZ_PIN,0);
     delay(100);
-    tone(12,1000);
+    tone(BUZZ_PIN,1000);
     delay(100);
-    tone(12,0);
-    tone(12,1000);
+    tone(BUZZ_PIN,0);
+    tone(BUZZ_PIN,1000);
     delay(100);
-    tone(12,0);
+    tone(BUZZ_PIN,0);
     Serial.begin(115200);
     if(!setupMPU()){
         tone(12,500);
@@ -134,8 +134,8 @@ void turn(float angle){
     //convert rotation from -270 to 90
     else if(offset_angle <= -PI)
         offset_angle += 2.0 * PI;
-
 }
+
 bool turning(){
     // return abs(offsetYaw(offset_angle) - ypr[0]) > 5;
     return millis() - lastTurn < TURNING_TIME;
@@ -143,6 +143,7 @@ bool turning(){
 
 unsigned long calculate_timer = 0;
 unsigned long LOG_timer = 0;
+
 void loop(){
     digitalWrite(2,LOW);
     entry = micros();
@@ -371,7 +372,7 @@ void loop(){
         //         // }
         // }
 
-        fw_speed = (fw_speed*7 + targetSpeed) / 8;
+        fw_speed = (fw_speed * 7 + targetSpeed) / 8;
         // fw_speed = targetSpeed;
 
         
@@ -383,15 +384,12 @@ void loop(){
     // }
         if(move_enable){
             if(left > 0){
-                // left += E_ratio; //-2 ok but lag
                 MotorControl.motorForward(1, left);
             }else{
-                // left -= E_ratio;
                 MotorControl.motorReverse(1, -left);
             }
-            
+    
             if(right > 0){
-                // right += E_ratio;
                 MotorControl.motorForward(0, right);
             }else{
                 // right -= E_ratio;
