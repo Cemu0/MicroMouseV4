@@ -25,6 +25,8 @@
 #define     SDA_PIN             21
 #define     SCL_PIN             22
 
+#define REVERT_MOTION 
+
 //motor control pin DRV8833
 #define     ERR_DETECT     13 
 
@@ -42,8 +44,28 @@
 #define     MB_EC1     18
 #define     MB_EC2     19
 
+// #define REVERT_ENCODER 
+
 //radius depend on mouse !
 // radius / pulse per one rotation, encoder , main gear / second gear
 // mm per pulse
-#define MM_PP_A  ((32.15 * PI) / (30 * (50/10) * 4))
-#define MM_PP_B  ((31.5 * PI) / (30 * (50/10) * 4))
+// #define MM_PP_A  ((32.15 * PI) / (30 * (50/10) * 4))
+// #define MM_PP_B  ((31.5 * PI) / (30 * (50/10) * 4))
+float a_ratio = 32.15;
+
+#define MM_PP_A  ((a_ratio * PI) / (334 * (50/10) * 4))
+#define MM_PP_B  ((31.5 * PI) / (334 * (50/10) * 4))
+
+
+// algorithm control
+// #define PD_LOOP_TIME 1000 //micro second
+// #define SPEED_UPDATE_LOOP_TIME 1000 //micro second
+
+unsigned long PD_LOOP_TIME = 1000;
+unsigned long SPEED_UPDATE_LOOP_TIME = 1000;
+
+
+#define USING_SPEED_FILTER 
+#define USING_TARGET_SPEED_FILTER 
+// #define FILTER_VALUE 20
+int FILTER_VALUE = 5;

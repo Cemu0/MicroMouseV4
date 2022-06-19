@@ -1,6 +1,5 @@
 #define CONFIG_ESP32_WIFI_TASK_PINNED_TO_CORE_1 1
 #include <esp_wifi.h>
-
 #include <Arduino.h>
 #include <ESPmDNS.h>
 #include <WiFi.h>

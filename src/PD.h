@@ -7,7 +7,7 @@ long hasLeftWall = 2000;
 long hasRightWall = 1600;
 #define leftMiddleValue 3500
 #define rightMiddleValue  3400
-
+/*
 long errorP = 0;
 long errorD = 0;
 long oldErrorP = 0;
@@ -41,12 +41,13 @@ long PID_SENSOR_FORWARD(long &leftSensor, long &rightSensor)
     // setLeftPwm(leftBaseSpeed - totalError);
     // setRightPwm(rightBaseSpeed + totalError);    
 }
-
-
-
+*/
 
 float P_speed = 0.7;
 float D_speed = 0.4;
+
+// float P_speed = 0;
+// float D_speed = 0;
 
 //FOR ROTATE USING ENCODER
 // #define P_rotation 2.5
@@ -56,15 +57,22 @@ float D_speed = 0.4;
 float P_rotation = 0.25;
 float D_rotation = 0.73;
 
+// float P_rotation = 0;
+// float D_rotation = 0;
+
 //for rotating at position
 void setRotatingValue(){
     P_rotation = 1.25;
     D_rotation = 2.33;
+    // P_rotation = 0;
+    // D_rotation = 0;
 }
 
 void setForwardValue(){
     P_rotation = 0.25;
     D_rotation = 0.73;
+    // P_rotation = 0;
+    // D_rotation = 0;
 }
 // float P_rotation = 0.5;
 // float D_rotation = 0;
@@ -80,21 +88,21 @@ long oldErrorP_rotation = 0;
 long wError = 0;
 
 
-void PD_SPEED_ANGULAR(const long &xSpeed,const long &wSpeed,const long& rotationError,const long& currentSpeed, 
+void PD_SPEED_ANGULAR(const long &xSpeed,const long &wSpeed,const float& rotationError,const float& currentSpeed, 
                             long& rightPWM,  long& leftPWM){
-    /*
-    xasdfasfads
-    */
+    // PD for the Movement
     errorP_speed = xSpeed - currentSpeed;
     errorD_speed = errorP_speed - oldErrorP_speed;
     xError = P_speed * errorP_speed + D_speed * errorD_speed;
     oldErrorP_speed = errorP_speed;
 
+    // PD for the 
     errorP_rotation = wSpeed - rotationError;
     errorD_rotation = errorP_rotation - oldErrorP_rotation;
     wError = P_rotation * errorP_rotation + D_rotation * errorD_rotation;
     oldErrorP_rotation = errorP_rotation;
 
+    //result
     rightPWM = xError + wError;
     leftPWM = xError - wError;
 }

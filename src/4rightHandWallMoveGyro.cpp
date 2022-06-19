@@ -36,8 +36,8 @@ unsigned long speed_timer = 0;
 bool speedCalculate(){
     auto detatime = millis() - speed_timer;
     if( detatime >= 10){ // THIS SHOULD BE FASTER IF YOU PLAN TO RUN FAST
-        speedA = ((encoderA.getCount() - oldCountA) + speedA*FILTER)/(FILTER+1);
-        speedB = ((encoderB.getCount() - oldCountB) + speedB*FILTER)/(FILTER+1);
+        speedA = ((encoderA.getCount() - oldCountA) + speedA*FILTER_VALUE)/(FILTER_VALUE+1);
+        speedB = ((encoderB.getCount() - oldCountB) + speedB*FILTER_VALUE)/(FILTER_VALUE+1);
 
         // speedA = encoderA.getCount() - oldCountA;
         // speedB = encoderB.getCount() - oldCountB;
