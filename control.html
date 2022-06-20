@@ -68,7 +68,8 @@
 
 
         const view = document.getElementById('stream');
-        const WS_URL = "ws://192.168.137.80/ws";
+        // const WS_URL = "ws://myesp32.local/ws";
+        const WS_URL = "ws://192.168.137.170/ws";
         const ws = new WebSocket(WS_URL);
 
         ws.onmessage = message => {
@@ -87,6 +88,7 @@
             if (lastSend === undefined || now - lastSend >= 30) {
                 try {
                     ws.send(txt);
+                    // console.log(lastText);
                     lastSend = new Date().getTime();
                     return;
                 } catch (e) {
@@ -101,6 +103,7 @@
                 sendTimeout = setTimeout(() => {
                     sendTimeout = null;
                     send(lastText);
+                    // console.log(lastText);
                 }, ms);
             }
         }
@@ -173,7 +176,7 @@
         return Math.round(nMotMixL * 2.55) + "," + Math.round(nMotMixR * 2.55);   // The function returns the product of p1 and p2
     }
 
-    setInterval(function () { send("" + joy.GetX() + ","+ joy.GetY()); }, 100);
+    setInterval(function () { send("" + joy.GetX() + ","+ joy.GetY()); }, 10);
 
 </script>
 

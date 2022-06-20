@@ -287,65 +287,69 @@ void loop(){
     speedCalculate();
 
 
+    //remote contorl
+    // if(Yvalue == 0 || Xvalue == 0){
+    //     targetSpeed = 0;
+    //     rt_speed = 0;
+    // }
+    // if(abs(Yvalue) > 25 || abs(Xvalue) > 25){
+    //     targetSpeed = Yvalue * 2;
+    //     rt_speed = Xvalue;
+    //     // turn(Xvalue/100);
+    //     move_enable = true;
+    // }
 
-    if(abs(Yvalue) < 25)
-        Yvalue = 0; 
+    // else {
+    //     move_enable = false;
+    // }
 
-    if(abs(Xvalue) < 25)
-        Xvalue = 0; 
 
-    if(Yvalue !=0 || Xvalue!=0){
-        targetSpeed = Yvalue/2;
-        rt_speed = Xvalue/2;
+    if(faceSensorValue3 > 3500 && move_enable){ // NEARLY HIT THE WALL 
+        if(targetSpeed != 0){
+            TelnetStream.println("EMERG_STOP");
+            move_enable = false;  
+            targetSpeed = 0;
+            MotorControl.motorsStop();
+        }
     }
 
+    if(faceSensorValue3 > hasFrontWall && !turning() && move_enable){ // turn 1700
+        if(targetSpeed != 0){
+            TelnetStream.println("APPROACH EDGE");
+            // fw_speed = 0;
+            // move_enable = false;
+            // rt_speed = -45;
+            if(faceSensorValue4 < hasRightWall){ // turn right
+                TelnetStream.print(TO_DEG(ypr[0]));
+                TelnetStream.print(" ");
+                TelnetStream.print(TO_DEG(offset_angle));
+                TelnetStream.print(" ");
+                turn(RIGHT);
+                TelnetStream.print(TO_DEG(offset_angle));
+                TelnetStream.println("Turn RIGHT");
+            } else if(faceSensorValue2 < hasLeftWall){ // turn right
+                TelnetStream.print(TO_DEG(ypr[0]));
+                TelnetStream.print(" ");
+                TelnetStream.print(TO_DEG(offset_angle));
+                TelnetStream.print(" ");
+                turn(LEFT);
+                TelnetStream.print(TO_DEG(offset_angle));
+                TelnetStream.println("Turn LEFT");
+            }else{
+                setRotatingValue();
+                turn(BACKWARD);
+                // targetSpeed = 0;
+                TelnetStream.println("ROTATE");
+                // MotorControl.motorsStop();
+                // move_enable = false;  
 
-        if(faceSensorValue3 > 3500 && move_enable){ // NEARLY HIT THE WALL 
-            if(targetSpeed != 0){
-                TelnetStream.println("EMERG_STOP");
-                move_enable = false;  
-                targetSpeed = 0;
-                MotorControl.motorsStop();
             }
-        }
-
-        if(faceSensorValue3 > hasFrontWall && !turning() && move_enable){ // turn 1700
-            if(targetSpeed != 0){
-                TelnetStream.println("APPROACH EDGE");
-                // fw_speed = 0;
-                // move_enable = false;
-                // rt_speed = -45;
-                if(faceSensorValue4 < hasRightWall){ // turn right
-                    TelnetStream.print(TO_DEG(ypr[0]));
-                    TelnetStream.print(" ");
-                    TelnetStream.print(TO_DEG(offset_angle));
-                    TelnetStream.print(" ");
-                    turn(RIGHT);
-                    TelnetStream.print(TO_DEG(offset_angle));
-                    TelnetStream.println("Turn RIGHT");
-                } else if(faceSensorValue2 < hasLeftWall){ // turn right
-                    TelnetStream.print(TO_DEG(ypr[0]));
-                    TelnetStream.print(" ");
-                    TelnetStream.print(TO_DEG(offset_angle));
-                    TelnetStream.print(" ");
-                    turn(LEFT);
-                    TelnetStream.print(TO_DEG(offset_angle));
-                    TelnetStream.println("Turn LEFT");
-                }else{
-                    setRotatingValue();
-                    turn(BACKWARD);
-                    // targetSpeed = 0;
-                    TelnetStream.println("ROTATE");
-                    // MotorControl.motorsStop();
-                    // move_enable = false;  
-
-                }
-                // offset_angle += (PI/2.0);
-            } 
-        } else if (move_enable && !turning()) {
-            setForwardValue();
-            // targetSpeed = 200;
-        }
+            // offset_angle += (PI/2.0);
+        } 
+    } else if (move_enable && !turning()) {
+        setForwardValue();
+        // targetSpeed = 200;
+    }
 
 
     target_angle = - offsetYaw(offset_angle) * E_ratio;
