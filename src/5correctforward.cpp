@@ -10,8 +10,8 @@
 
 unsigned long entry;
 
-const char* ssid = "CI3_R1";
-const char* password = "154dsgf654ref";
+const char* ssid = "mouse_2";
+const char* password = "micromouse";
 
 ESP32MotorControl MotorControl = ESP32MotorControl();
 ESP32Encoder encoderA(true);
@@ -286,19 +286,24 @@ void loop(){
     readIRsensor();
     speedCalculate();
 
-
+    #ifdef REMOTE_CONTROLER
     //remote contorl
-    // if(Yvalue == 0 && Xvalue == 0){
-    //     targetSpeed = 0;
-    //     rt_speed = 0;
-    //     move_enable = false;
-    // }
-    // if(abs(Yvalue) > 25 || abs(Xvalue) > 25){
-    //     targetSpeed = Yvalue * 10;
-    //     rt_speed = Xvalue;
-    //     // turn(Xvalue/100);
-    //     move_enable = true;
-    // }
+    if(Yvalue == 0 && Xvalue == 0){
+        fw_speed = 0;
+        rt_speed = 0;
+        move_enable = false;
+    }
+    if(abs(Yvalue) > 25 || abs(Xvalue) > 25){
+        fw_speed = Yvalue * 5;
+        rt_speed = Xvalue * 5;
+        // turn(Xvalue/100);
+        move_enable = true;
+        TelnetStream.print(" ");
+        TelnetStream.print(fw_speed);
+        TelnetStream.print(" ");
+        TelnetStream.println(rt_speed);
+    }
+    #else
 
     if(faceSensorValue3 > 3500 && move_enable){ // NEARLY HIT THE WALL 
         if(targetSpeed != 0){
@@ -347,25 +352,26 @@ void loop(){
         // targetSpeed = 200;
     }
 
-
-    target_angle = - offsetYaw(offset_angle) * E_ratio;
+        target_angle = - offsetYaw(offset_angle) * E_ratio;
     
-    if(abs(target_angle) < 100 && speedA + speedB > 40)
-        rt_speed = 0;
+        if(abs(target_angle) < 100 && speedA + speedB > 40)
+            rt_speed = 0;
 
-    else if(abs(target_angle) > 700){
-        if(target_angle>0)
-            rt_speed = 700;
-        else    
-            rt_speed = -700;
-    }
-    else   
-        rt_speed = target_angle;
+        else if(abs(target_angle) > 700){
+            if(target_angle>0)
+                rt_speed = 700;
+            else    
+                rt_speed = -700;
+        }
+        else   
+            rt_speed = target_angle;
 
-    #ifdef USING_TARGET_SPEED_FILTER
-        fw_speed = (fw_speed * FILTER_VALUE + targetSpeed) / (FILTER_VALUE+1);
-    #else
-        fw_speed = targetSpeed;
+        #ifdef USING_TARGET_SPEED_FILTER
+            fw_speed = (fw_speed * FILTER_VALUE + targetSpeed) / (FILTER_VALUE+1);
+        #else
+            fw_speed = targetSpeed;
+        #endif
+
     #endif
     
     if(micros() - math_timer > PD_LOOP_TIME){
@@ -390,6 +396,8 @@ void loop(){
             // right -= E_ratio;
             MotorControl.motorReverse(1, -right);
         }
+    }else{
+        MotorControl.motorsStop();
     }
 
     
