@@ -288,21 +288,17 @@ void loop(){
 
 
     //remote contorl
-    // if(Yvalue == 0 || Xvalue == 0){
+    // if(Yvalue == 0 && Xvalue == 0){
     //     targetSpeed = 0;
     //     rt_speed = 0;
+    //     move_enable = false;
     // }
     // if(abs(Yvalue) > 25 || abs(Xvalue) > 25){
-    //     targetSpeed = Yvalue * 2;
+    //     targetSpeed = Yvalue * 10;
     //     rt_speed = Xvalue;
     //     // turn(Xvalue/100);
     //     move_enable = true;
     // }
-
-    // else {
-    //     move_enable = false;
-    // }
-
 
     if(faceSensorValue3 > 3500 && move_enable){ // NEARLY HIT THE WALL 
         if(targetSpeed != 0){
@@ -327,7 +323,7 @@ void loop(){
                 turn(RIGHT);
                 TelnetStream.print(TO_DEG(offset_angle));
                 TelnetStream.println("Turn RIGHT");
-            } else if(faceSensorValue2 < hasLeftWall){ // turn right
+            } else if(faceSensorValue2 < hasLeftWall){ // turn left
                 TelnetStream.print(TO_DEG(ypr[0]));
                 TelnetStream.print(" ");
                 TelnetStream.print(TO_DEG(offset_angle));
@@ -376,7 +372,6 @@ void loop(){
         PD_SPEED_ANGULAR(fw_speed, rt_speed, ((speedA - speedB) * 2.0), (speedA + speedB) / 2.0, left, right);
         math_timer = micros();
     }
-
 
     if(move_enable){
         if(left > 0){

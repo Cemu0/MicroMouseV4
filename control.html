@@ -68,8 +68,8 @@
 
 
         const view = document.getElementById('stream');
-        // const WS_URL = "ws://myesp32.local/ws";
-        const WS_URL = "ws://192.168.137.170/ws";
+        const WS_URL = "ws://myesp32.local/ws";
+        // const WS_URL = "ws://192.168.137.215/ws";
         const ws = new WebSocket(WS_URL);
 
         ws.onmessage = message => {

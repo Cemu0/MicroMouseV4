@@ -17,5 +17,6 @@
     "cSpell.words": [
         "dsgf",
         "ssid"
-    ]
+    ],
+    "cmake.configureOnOpen": false
 }

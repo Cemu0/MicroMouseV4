@@ -71,10 +71,12 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
 
 void setupServer(){
     MDNS.begin("myesp32");
+    MDNS.addService("ws", "tcp", 80);
+    MDNS.addService("telnet", "tcp", 23);
+    
     #ifdef USE_ASYNC_ELEGANT_OTA
         AsyncElegantOTA.begin(&server);    // Start AsyncElegantOTA
     #else
-
         ArduinoOTA.setHostname("myesp32");
         // ArduinoOTA.setHostname("myesp32");
         // Port defaults to 3232
@@ -123,6 +125,7 @@ void setupServer(){
     //     response->addHeader("Content-Encoding", "gzip");
     //     request->send(response);
     // });
+    
     ws.onEvent(onEvent);
     server.addHandler(&ws);
     server.begin();

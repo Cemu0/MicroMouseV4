@@ -2,7 +2,7 @@
 #define P 1
 #define D 1
 //for 1 and 5
-long hasFrontWall = 1900;
+long hasFrontWall = 2100;
 long hasLeftWall = 2000;
 long hasRightWall = 1600;
 #define leftMiddleValue 3500
