@@ -4,7 +4,7 @@
 //for 1 and 5
 long hasFrontWall = 2100;
 long hasLeftWall = 2000;
-long hasRightWall = 1600;
+long hasRightWall = 1200;
 #define leftMiddleValue 3500
 #define rightMiddleValue  3400
 /*
