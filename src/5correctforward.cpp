@@ -246,6 +246,7 @@ void loop(){
 
             case 'm':
                 speed = data.substring(1).toFloat();
+                move_enable = true;  
                 if(speed > 0){
                     MotorControl.motorForward(0, speed);
                     MotorControl.motorForward(1, speed);
