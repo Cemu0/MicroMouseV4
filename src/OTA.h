@@ -23,12 +23,12 @@ int Xvalue = 0, Yvalue = 0;
 
 void connectWifi(const char* ssid, const char* password){
     WiFi.setSleep(false);
-    WiFi.mode(WIFI_STA);
     esp_wifi_set_ps(WIFI_PS_NONE);
+    WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
     while (WiFi.waitForConnectResult() != WL_CONNECTED) {
         Serial.println("Connection Failed! Rebooting...");
-        delay(5000);
+        delay(100);
         ESP.restart();
     }
 }
@@ -43,10 +43,6 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
     data[len] = 0;
-    // if (strcmp((char*)data, "toggle") == 0) {
-        
-    // }
-
     handle_message(String((char*)data));
   }
 }
@@ -130,6 +126,4 @@ void setupServer(){
     server.addHandler(&ws);
     server.begin();
     TelnetStream.begin();
-
-    
 }

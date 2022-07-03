@@ -1,4 +1,6 @@
 
+#pragma once
+
 #define P 1
 #define D 1
 //for 1 and 5
@@ -88,7 +90,7 @@ long oldErrorP_rotation = 0;
 long wError = 0;
 
 
-void PD_SPEED_ANGULAR(const long &xSpeed,const long &wSpeed,const float& rotationError,const float& currentSpeed, 
+void pdSpeedAngular(const long &xSpeed,const long &wSpeed,const float& rotationError,const float& currentSpeed, 
                             long& rightPWM,  long& leftPWM){
     // PD for the Movement
     errorP_speed = xSpeed - currentSpeed;
@@ -105,4 +107,11 @@ void PD_SPEED_ANGULAR(const long &xSpeed,const long &wSpeed,const float& rotatio
     //result
     rightPWM = xError + wError;
     leftPWM = xError - wError;
+}
+
+void calculatePD(){
+    if(micros() - math_timer > PD_LOOP_TIME){
+        pdSpeedAngular(fw_speed, rt_speed, ((speedA - speedB) * 2.0), (speedA + speedB) / 2.0, left_pwm, right_pwm);
+        math_timer = micros();
+    }
 }

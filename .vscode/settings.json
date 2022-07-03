@@ -12,7 +12,10 @@
         "streambuf": "cpp",
         "tuple": "cpp",
         "type_traits": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "regex": "cpp",
+        "bitset": "cpp",
+        "random": "cpp"
     },
     "cSpell.words": [
         "dsgf",

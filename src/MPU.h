@@ -1,10 +1,10 @@
+#pragma once
+#include <TelnetStream.h>
 #include "Arduino.h"
 #include "I2Cdev.h"
-#include "system_def.h"
-
+#include "variable.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 #include <Wire.h>
-
 
 // MPU control/status vars
 MPU6050 mpu;
@@ -17,45 +17,16 @@ uint8_t fifoBuffer[64]; // FIFO storage buffer
 
 Quaternion q;           // [w, x, y, z]         quaternion container
 VectorFloat gravity;    // [x, y, z]            gravity vector
-float ypr[3];   
-float delta;
 
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
 void ICACHE_RAM_ATTR dmpDataReady() {
     mpuInterrupt = true;
 }
 
-uint8_t setupMPU(){
-    Wire.begin();
-    Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
-    mpu.initialize();
-    if (!mpu.testConnection())
-        return false;
-    devStatus = mpu.dmpInitialize();
-    if (devStatus == 0) {
-        mpu.setDMPEnabled(true);
-        attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
-        dmpReady = true;
-        packetSize = mpu.dmpGetFIFOPacketSize();
-
-        //using the calibrated value
-
-        // mpu.setXAccelOffset(-318); 
-        // mpu.setYAccelOffset(1365); 
-        // mpu.setZAccelOffset(1822); 
-        // mpu.setXGyroOffset(46);
-        // mpu.setYGyroOffset(-15);
-        // mpu.setZGyroOffset(12);
-
-        // enable this to calibrate
-        mpu.CalibrateAccel(10);
-        mpu.CalibrateGyro(12);
-        // enable this to print the calibrated value
-        mpu.PrintActiveOffsets();
-
-        return true;
-    }
-}
+TaskHandle_t mpuTask;
+void readGyroTask(void);
+bool readGyro();
+float offsetYaw(float);
 
 float offsetYaw(float offset){
     delta = ypr[0] - offset;
@@ -76,9 +47,20 @@ float offsetYaw(float offset){
     }
 }
 
-void readGyro(){
-    if (!dmpReady) return;
-    if (!mpuInterrupt && fifoCount < packetSize) return;
+void readGyroTask(void * parameter){
+    while(1){
+        if(readGyro())
+            delay(1);
+        else{
+            TelnetStream.println("over flow !");
+            Serial.println("over flow !");
+        }
+    }
+}
+
+bool readGyro(){
+    if (!dmpReady) return true;
+    if (!mpuInterrupt && fifoCount < packetSize) return true;
     mpuInterrupt = false;
     mpuIntStatus = mpu.getIntStatus();
     fifoCount = mpu.getFIFOCount();
@@ -86,7 +68,8 @@ void readGyro(){
     if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
         // reset so we can continue cleanly
         mpu.resetFIFO();
-        TelnetStream.println("over flow !!!");
+        // 
+        return false;
 
         // otherwise, check for DMP data ready interrupt (this should happen frequently)
     } else if (mpuIntStatus & 0x02) {
@@ -104,4 +87,36 @@ void readGyro(){
         // Serial.print("\t");
         // Serial.println(ypr[2] * 180/M_PI);
     }
+
+    return true;
+}
+
+bool initMPU(){
+    Wire.begin();
+    Wire.setClock(800000); // 400kHz I2C clock. Comment this line if having compilation difficulties
+    mpu.initialize();
+    if (!mpu.testConnection())
+        return false;
+    devStatus = mpu.dmpInitialize();
+    if (devStatus == 0) {
+        mpu.setDMPEnabled(true);
+        attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
+        dmpReady = true;
+        packetSize = mpu.dmpGetFIFOPacketSize();
+        //using the calibrated value
+        // mpu.setXAccelOffset(-318); 
+        // mpu.setYAccelOffset(1365); 
+        // mpu.setZAccelOffset(1822); 
+        // mpu.setXGyroOffset(46);
+        // mpu.setYGyroOffset(-15);
+        // mpu.setZGyroOffset(12);
+        // enable this to calibrate
+        mpu.CalibrateAccel(10);
+        mpu.CalibrateGyro(12);
+        // enable this to print the calibrated value
+        mpu.PrintActiveOffsets();
+    }
+    
+    xTaskCreatePinnedToCore(readGyroTask,"gyroRead",10000,NULL,2,&mpuTask,1);
+    return true;
 }
