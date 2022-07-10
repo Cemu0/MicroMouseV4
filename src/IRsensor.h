@@ -12,6 +12,14 @@
 
 #define PREVENT_ZERO(val) val>=0?val:0
 
+//for 1 and 5
+long collapseFrontWall = 3500;
+long hasFrontWall = 1000;
+long hasLeftWall = 1000;
+long hasRightWall = 1000;
+#define leftMiddleValue 3500
+#define rightMiddleValue  3400
+
 long faceSensorValue1 = 0;
 long faceSensorValue2 = 0;
 long faceSensorValue3 = 0;
@@ -19,7 +27,7 @@ long faceSensorValue4 = 0;
 long faceSensorValue5 = 0;
 
 // the value that determent when the mouse approach edge
-bool frontWall,leftWall,rightWall;
+int frontWall,leftWall,rightWall;
 
 // #define analogReads1 adc1_get_raw(ADC1_CHANNEL_0)
 // #define analogReads2 adc1_get_raw(ADC1_CHANNEL_3)
@@ -51,7 +59,7 @@ void initIR(){
     digitalWrite(SENSOR_ACTIVATE_GROUP_C, LOW);
 }
 
-void readIRsensor(){
+void readIRsensor(bool captureValue = false){
     long thread_value1 = analogRead(SENSOR_PIN_1);// - ThdVal1; adc1_get_raw(ADC1_CHANNEL_0);
     long thread_value2 = analogRead(SENSOR_PIN_2);// - ThdVal2; adc1_get_raw(ADC1_CHANNEL_3);
     long thread_value3 = analogRead(SENSOR_PIN_3);// - ThdVal3;
@@ -105,11 +113,15 @@ void readIRsensor(){
 
     // digitalWrite(SENSOR_ACTIVATE_GROUP_C,LOW);
 
+    if(faceSensorValue3 < collapseFrontWall)
+        frontWall = faceSensorValue3 > hasFrontWall;
+    else 
+        frontWall = -1;
 
-    // if()
-    frontWall = faceSensorValue3 > hasFrontWall;
-    leftWall = faceSensorValue2 > hasLeftWall;
-    rightWall = faceSensorValue4 > hasRightWall;
+    if(captureValue){
+        leftWall = faceSensorValue2 > hasLeftWall;
+        rightWall = faceSensorValue4 > hasRightWall;
+    }
 
 
 
@@ -117,8 +129,14 @@ void readIRsensor(){
 }
 
 void printIR(Stream &stream){
+    // stream.print(" ");
+    // stream.print(LED_WARMUP_TIME);
     stream.print(" ");
-    stream.print(LED_WARMUP_TIME);
+    stream.print(leftWall);
+    stream.print("-");
+    stream.print(frontWall);
+    stream.print("-");
+    stream.print(rightWall);
     stream.print(" ");
     stream.print(faceSensorValue1);
     stream.print(" ");

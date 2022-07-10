@@ -20,16 +20,27 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 int Xvalue = 0, Yvalue = 0;
 
-
+//note you should turn on and off wifiHotspot 
 void connectWifi(const char* ssid, const char* password){
-    WiFi.setSleep(false);
-    esp_wifi_set_ps(WIFI_PS_NONE);
+    WiFi.disconnect();
+    esp_wifi_disconnect();
+    esp_wifi_stop();
+    esp_wifi_deinit();
+    // WiFi.setSleep(false);
+    // esp_wifi_set_ps(WIFI_PS_NONE);
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
-    while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    unsigned long timer = millis();
+    while ((WiFi.status() != WL_CONNECTED) && (millis() - timer <= 10000)){
+      Serial.println("ConnectingWIFI..."); 
+      delay(1000);
+    };
+    if(WiFi.status() != WL_CONNECTED){
+    // while (WiFi.waitForConnectResult() != WL_CONNECTED) {
         Serial.println("Connection Failed! Rebooting...");
         delay(100);
         ESP.restart();
+    // }
     }
 }
 

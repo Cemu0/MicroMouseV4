@@ -5,8 +5,10 @@
 #include "motor.h"
 #include "MPU.h" 
 #include "OTA.h"
-#include "debug.h"
+#include "maze.h"
 #include "algorithm.h"
+#include "debug.h"
+
 
 void setup(){
     initMotor();
@@ -33,7 +35,13 @@ void loop(){
     readIRsensor();
     speedCalculate();
 
-    calculateAlgo();
+
+    if(updateCellPos()){
+        readIRsensor(true);
+        //when enter new cell 
+        tone(1000,50);
+        calculateAlgo();
+    };
 
     calculatePD();
     motorMove();

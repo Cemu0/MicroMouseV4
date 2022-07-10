@@ -168,14 +168,27 @@ void debugHandle(){
             TelnetStream.print(" ");
             TelnetStream.println(offsetYaw(offset_angle)* 180/M_PI);
         }
+        if(debug == 4){
+            TelnetStream.print(" ");
+            TelnetStream.print(fw_speed);
+            TelnetStream.print(" ");
+            TelnetStream.print(rt_speed);
+        }
 
         if(debug == 5){
             TelnetStream.print(micros()-entry); 
             printIR(TelnetStream);
         }
+
+        if(debug == 6){
+            TelnetStream.print("cPos: ");
+            TelnetStream.println(currentPosInCell); 
+        }
+
         if(debug == 10){
             yield();
             TelnetStream.print("FROZEN SYSTEM for upload!!! ");
+            TelnetStream.stop();
             vTaskDelete(mpuTask);
             delay(100000);
         }

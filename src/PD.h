@@ -3,12 +3,7 @@
 
 #define P 1
 #define D 1
-//for 1 and 5
-long hasFrontWall = 2100;
-long hasLeftWall = 2000;
-long hasRightWall = 1200;
-#define leftMiddleValue 3500
-#define rightMiddleValue  3400
+
 /*
 long errorP = 0;
 long errorD = 0;
@@ -63,14 +58,14 @@ float D_rotation = 0.73;
 // float D_rotation = 0;
 
 //for rotating at position
-void setRotatingValue(){
+void setPIDRotatingValue(){
     P_rotation = 1.25;
     D_rotation = 2.33;
     // P_rotation = 0;
     // D_rotation = 0;
 }
 
-void setForwardValue(){
+void setPIDForwardValue(){
     P_rotation = 0.25;
     D_rotation = 0.73;
     // P_rotation = 0;
