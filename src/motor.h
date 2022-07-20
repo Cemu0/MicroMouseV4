@@ -58,7 +58,7 @@ bool speedCalculate(){
 }
 
 
-void turn(float angle){
+void gyroTurn(float angle){
     lastTurn = millis();
     offset_angle += angle;
 
@@ -74,6 +74,71 @@ void turn(float angle){
 bool turning(){
     // return abs(offsetYaw(offset_angle) - ypr[0]) > 5;
     return millis() - lastTurn < TURNING_TIME;
+}
+
+long turningLength = 0.25 * 180 * PI + 40; //141.37166941154069573081895224758
+int64_t accelerateLength = 0;
+int64_t turnLength = 0;
+int64_t turnLengthOld = 0;
+float turnSide = 0.5;
+float turnSpeed = 50; //h20
+float turnAccelerate = 500; //mm/s^2 //g100
+unsigned long timeTurnAccelerate = 0;
+int turningPhase = 0;
+
+void EncoderTurn(float side){
+    turnSide = side;
+    lastTurn = millis();
+    rt_speed = 0;
+    turningPhase = 0;
+    turnLengthOld = (encoderA.getCount() + encoderB.getCount())/2;
+    timeTurnAccelerate = millis();
+    if(side > 0)
+        gyroTurn(RIGHT);
+    else
+        gyroTurn(LEFT);
+
+
+    // TelnetStream.print(" start turn ");
+}
+
+void EncoderTurnUpdate(Stream &stream){
+    // rt_speed = 0;
+    auto absLength = (encoderA.getCount() + encoderB.getCount())/(int64_t)2;
+    turnLength = absLength - turnLengthOld;
+    turnLengthOld = absLength;
+
+    // stream.print(encoderA.getCount());
+    // stream.print(" ");
+    // stream.print(encoderB.getCount());
+    // stream.print(" ");
+
+    //speed up
+    if(abs(rt_speed) < turnSpeed && turningPhase == 0){
+        rt_speed += turnSide * ((millis() - timeTurnAccelerate) / 1000.0) * turnAccelerate;
+        accelerateLength = turnLength;
+        stream.print(rt_speed);
+        stream.print(" ");
+        stream.print(accelerateLength);
+        stream.println(" acc");
+    //keep speed
+    }else if (abs(rt_speed) >= turnSpeed && (turningLength - accelerateLength) < turnLength){
+        stream.print(turnLength);
+        stream.println("keep");
+        timeTurnAccelerate = millis();
+        turningPhase = 1;
+    //speed down
+    }else if (abs(rt_speed) > 15){
+        turningPhase = 2;
+        rt_speed  -= turnSide * ((millis() - timeTurnAccelerate) / 1000.0) * turnAccelerate;
+        stream.print(rt_speed);
+        stream.println("dec");
+    }else{
+        lastTurn = 0; //complete turn
+        rt_speed = 0;
+        stream.println(" complete turn");
+    }
+    
 }
 
 void motorMove(){
@@ -98,3 +163,4 @@ void motorMove(){
         MotorControl.motorsStop();
     }
 }
+
