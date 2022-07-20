@@ -82,7 +82,7 @@ int64_t turnLength = 0;
 int64_t turnLengthOld = 0;
 float turnSide = 0.5;
 float turnSpeed = 50; //h20
-float turnAccelerate = 500; //mm/s^2 //g100
+float turnAccelerate = 150; //mm/s^2 //g100
 unsigned long timeTurnAccelerate = 0;
 int turningPhase = 0;
 
@@ -100,6 +100,7 @@ void EncoderTurn(float side){
 
 
     // TelnetStream.print(" start turn ");
+    
 }
 
 void EncoderTurnUpdate(Stream &stream){

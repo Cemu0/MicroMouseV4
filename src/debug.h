@@ -33,6 +33,7 @@ void telnetStreamHandle(){
                 TelnetStream.println("Test Forward");
                 offset_angle = ypr[0];
                 targetSpeed = data.substring(1).toInt();
+                time_accelerate = millis();
                 move_enable = true;
                 break;
             case 'S':
@@ -46,7 +47,21 @@ void telnetStreamHandle(){
             case 'C':
                 offset_angle = TO_RADIAN(data.substring(1).toFloat());
                 TelnetStream.print(offset_angle);
-                TelnetStream.println("offset_angle...");
+                TelnetStream.println("self rotating mode...");
+                break;
+
+            case 'B':
+                TelnetStream.println("Test Algorithm");
+                resetCell();
+                offset_angle = ypr[0];
+                targetSpeed = data.substring(1).toInt();
+                time_accelerate = millis();
+                move_enable = true;
+                break;
+
+            case 'T':
+                TelnetStream.println("Test Encoder Turn");
+                EncoderTurn(data.substring(1).toInt());
                 break;
 
             case 'P':
@@ -84,14 +99,25 @@ void telnetStreamHandle(){
                 TelnetStream.println("a_ratio");
                 break;
 
+            case 'g':
+                turnAccelerate = data.substring(1).toFloat();
+                oldErrorP_rotation = 0;
+                TelnetStream.println("turnAccelerate");
+                break;
+
+            case 'h':
+                turnSpeed = data.substring(1).toFloat();
+                TelnetStream.println("turnSpeed");
+                break;
+
             case 'o':
-                PD_LOOP_TIME = data.substring(1).toInt();
-                TelnetStream.println("PD_LOOP_TIME");
+                forwardWallRatio = data.substring(1).toInt();
+                TelnetStream.println("forwardWallRatio");
                 break;
 
             case 'i':
-                SPEED_UPDATE_LOOP_TIME = data.substring(1).toInt();
-                TelnetStream.println("SPEED_UPDATE_LOOP_TIME");
+                centerMoveVal = data.substring(1).toInt();
+                TelnetStream.println("centerMoveVal");
                 break;
 
             case 'F':
@@ -170,9 +196,12 @@ void debugHandle(){
         }
         if(debug == 4){
             TelnetStream.print(" ");
+            TelnetStream.print(rotateError);
+            TelnetStream.print(" ");
             TelnetStream.print(fw_speed);
             TelnetStream.print(" ");
-            TelnetStream.print(rt_speed);
+            TelnetStream.println(rt_speed);
+            
         }
 
         if(debug == 5){
@@ -206,7 +235,7 @@ void remoteControl(){
     if(abs(Yvalue) > 25 || abs(Xvalue) > 25){
         fw_speed = Yvalue * 5;
         rt_speed = Xvalue * 5;
-        // turn(Xvalue/100);
+        // gyroTurn(Xvalue/100);
         move_enable = true;
         TelnetStream.print(" ");
         TelnetStream.print(fw_speed);

@@ -13,9 +13,9 @@
 #define PREVENT_ZERO(val) val>=0?val:0
 
 //for 1 and 5
-long collapseFrontWall = 3500;
+long collapseFrontWall = 4070;
 long hasFrontWall = 1000;
-long hasLeftWall = 1000;
+long hasLeftWall = 1320;
 long hasRightWall = 1000;
 #define leftMiddleValue 3500
 #define rightMiddleValue  3400
@@ -59,7 +59,7 @@ void initIR(){
     digitalWrite(SENSOR_ACTIVATE_GROUP_C, LOW);
 }
 
-void readIRsensor(bool captureValue = false){
+void readIRsensor(){
     long thread_value1 = analogRead(SENSOR_PIN_1);// - ThdVal1; adc1_get_raw(ADC1_CHANNEL_0);
     long thread_value2 = analogRead(SENSOR_PIN_2);// - ThdVal2; adc1_get_raw(ADC1_CHANNEL_3);
     long thread_value3 = analogRead(SENSOR_PIN_3);// - ThdVal3;
@@ -118,14 +118,10 @@ void readIRsensor(bool captureValue = false){
     else 
         frontWall = -1;
 
-    if(captureValue){
-        leftWall = faceSensorValue2 > hasLeftWall;
-        rightWall = faceSensorValue4 > hasRightWall;
-    }
-
-
-
+    leftWall = faceSensorValue2 > hasLeftWall;
     
+    rightWall = faceSensorValue4 > hasRightWall;
+
 }
 
 void printIR(Stream &stream){
@@ -147,4 +143,15 @@ void printIR(Stream &stream){
     stream.print(faceSensorValue4);
     stream.print(" ");
     stream.println(faceSensorValue5);
+}
+
+void printWall(Stream &stream){
+    // stream.print(" ");
+    // stream.print(LED_WARMUP_TIME);
+    stream.print(" ");
+    stream.print(leftWall);
+    stream.print("-");
+    stream.print(frontWall);
+    stream.print("-");
+    stream.println(rightWall);
 }

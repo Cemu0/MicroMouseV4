@@ -1,7 +1,7 @@
 #include "variable.h"
-#include "PD.h"
 #include "tone.h"
 #include "IRsensor.h"
+#include "PD.h"
 #include "motor.h"
 #include "MPU.h" 
 #include "OTA.h"
@@ -28,23 +28,28 @@ void setup(){
     readyTone();
 }
 
+void updateMovement(){
+    readIRsensor();
+    speedCalculate();
+
+    hitWallStop();
+    if(updateCellPos()){
+        TelnetStream.println(++cellX);
+    // if(updateCellPos()){
+        // readIRsensor();
+        //when enter new cell 
+        tone(1000,10);
+    calculateAlgo();
+    };
+    calculatePD(movingAlgoUpdate());
+    motorMove();
+}
+
 void loop(){
     buildInLedOn();
     entry = micros();
     ws.cleanupClients(1);
-    readIRsensor();
-    speedCalculate();
-
-
-    if(updateCellPos()){
-        readIRsensor(true);
-        //when enter new cell 
-        tone(1000,50);
-        calculateAlgo();
-    };
-
-    calculatePD();
-    motorMove();
+    updateMovement();
     #ifndef USE_ASYNC_ELEGANT_OTA
         ArduinoOTA.handle();
     #endif

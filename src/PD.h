@@ -85,7 +85,7 @@ long oldErrorP_rotation = 0;
 long wError = 0;
 
 
-void pdSpeedAngular(const long &xSpeed,const long &wSpeed,const float& rotationError,const float& currentSpeed, 
+void pdSpeedAngular(const float &xSpeed,const float &wSpeed,const float& rotationError,const float& currentSpeed, 
                             long& rightPWM,  long& leftPWM){
     // PD for the Movement
     errorP_speed = xSpeed - currentSpeed;
@@ -104,8 +104,18 @@ void pdSpeedAngular(const long &xSpeed,const long &wSpeed,const float& rotationE
     leftPWM = xError - wError;
 }
 
-void calculatePD(){
+long rotateError = 0;
+float forwardWallRatio = 0.3;
+long centerMoveVal = 850;
+
+void calculatePD(bool forwardWall = true){
     if(micros() - math_timer > PD_LOOP_TIME){
+        if(leftWall == 1 && rightWall == 1){
+            rotateError = faceSensorValue2 - faceSensorValue4 - centerMoveVal;
+            if(forwardWall)
+                rt_speed = rotateError * forwardWallRatio;
+        }
+
         pdSpeedAngular(fw_speed, rt_speed, ((speedA - speedB) * 2.0), (speedA + speedB) / 2.0, left_pwm, right_pwm);
         math_timer = micros();
     }

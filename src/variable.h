@@ -26,8 +26,8 @@ float E_ratio = 700;
 unsigned long acc_timer = 0;
 unsigned long math_timer = 0;
 
-long fw_speed = 0;
-long rt_speed = 0;
+float fw_speed = 0;
+float rt_speed = 0;
 long left_pwm;
 long right_pwm;
 float target_angle;
@@ -42,7 +42,7 @@ byte debug = 0;
 #define TO_RADIAN(n) (n  * PI) / 180.0
 #define TO_DEG(n) n * (180/PI)
 
-#define TURNING_TIME 500
+#define TURNING_TIME 9000
 
 unsigned long lastTurn = 0;
 

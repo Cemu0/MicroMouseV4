@@ -1,30 +1,25 @@
 #pragma once
-long turnPosition = 30;
+long turnPosition = 0;
 bool turnAround = false;
-long oldTargetSpeed = 0;
+
+float oldTargetSpeed = 200;
+float accelerate = 500; //mm/s^2
+unsigned long time_accelerate = 0;
+float realAcc;
+
 void hitWallStop(){
     if(frontWall == -1 && move_enable){ // NEARLY HIT THE WALL 
         if(targetSpeed != 0){
             TelnetStream.println("EMERG_STOP");
             move_enable = false;  
             targetSpeed = 0;
+            fw_speed = 0;
             MotorControl.motorsStop();
         }
     }
 }
 
-void movingUpdate(){
-    if (move_enable ) {
-        if(!turning()){
-            setPIDForwardValue();
-            if(turnAround){
-                turnAround = false;
-                targetSpeed = oldTargetSpeed;
-            }
-        }
-    }else{
-        
-    }
+void gyroMoveAngle(){
     target_angle = - offsetYaw(offset_angle) * E_ratio;
 
     if(abs(target_angle) < 100 && speedA + speedB > 40)
@@ -38,44 +33,88 @@ void movingUpdate(){
     }
     else   
         rt_speed = target_angle;
-
-    //should replace by a accelerate calculate
-    #ifdef USING_TARGET_SPEED_FILTER
-        fw_speed = (fw_speed * FILTER_VALUE + targetSpeed) / (FILTER_VALUE+1);
-    #else
-        fw_speed = targetSpeed;
-    #endif
 }
 
+//process forward and rotating 
+bool movingAlgoUpdate(){
+    if (move_enable) {
+        if(!turning()){
+            setPIDForwardValue();
+            if(turnAround){
+                turnAround = false;
+                targetSpeed = oldTargetSpeed;
+                currentPosInCell = 40;
+            }else{
+                gyroMoveAngle(); //use to turn around and forward
+            }
+        }else{
+            // gyroMoveAngle(); //use gyro for normal turn
+            EncoderTurnUpdate(TelnetStream);
+            time_accelerate = millis();
+            return false;
+        }
+    }
+
+
+    //accelerate and calculate the speed
+    if(abs(fw_speed - targetSpeed) > 1){
+        realAcc = ((millis() - time_accelerate) / 1000.0) * accelerate;
+        
+        if(fw_speed < targetSpeed)
+            fw_speed += realAcc;
+
+        if(fw_speed > targetSpeed)
+            fw_speed -= realAcc;
+
+        time_accelerate = millis();
+    }
+
+    return true;
+}
+
+
+
+
 void startRotateAround(){
+    MotorControl.motorsStop();
+    delay(100);
     setPIDRotatingValue();
-    turn(BACKWARD);
+    gyroTurn(BACKWARD);
     turnAround = true;
     oldTargetSpeed = targetSpeed;
     targetSpeed = 0;
+    fw_speed = 0; //TODO: using de_accelerate to prevent slip
 }
+
 
 //right wall move
 void calculateAlgo(){
-    hitWallStop();
-    if(move_enable && currentPosInCell > turnPosition){
-        if(!rightWall){
-            TelnetStream.println("Turn RIGHT");
-            turn(RIGHT);
-        }else{
-            if(frontWall){
-                if(!leftWall){
-                    turn(LEFT);
-                    TelnetStream.println("Turn LEFT");
-                }else{
-                    //running rotate sequence
-                    startRotateAround();
-                    TelnetStream.println("Turn AROUND");
-
+    if(move_enable && !turning()){
+        if(currentPosInCell >= turnPosition){
+            printWall(TelnetStream);
+            if(!rightWall){
+                    // gyroTurn(RIGHT);
+                    EncoderTurn(0.5);
+                    currentPosInCell = 0;
+                    TelnetStream.println("Turn RIGHT");
+            }else{
+                if(frontWall == 1){
+                    if(!leftWall){
+                            // gyroTurn(LEFT);
+                            EncoderTurn(-0.5);
+                            currentPosInCell = 0;
+                            TelnetStream.println("Turn LEFT");
+                    }else{
+                        //running rotate sequence
+                        startRotateAround();
+                        TelnetStream.println("Turn AROUND");
+                    }
                 }
             }
-
         }
     }
-    movingUpdate();
 }
+
+// void gyroTurn(){
+
+// }
