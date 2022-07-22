@@ -39,10 +39,7 @@ void telnetStreamHandle(){
             case 'S':
             case 's':
                 TelnetStream.println("STOP");
-                targetSpeed = 0;
-                rt_speed = 0;
-                move_enable = false;  
-                MotorControl.motorsStop();
+                stopMove();
                 break;
             case 'C':
                 offset_angle = TO_RADIAN(data.substring(1).toFloat());
@@ -53,6 +50,7 @@ void telnetStreamHandle(){
             case 'B':
                 TelnetStream.println("Test Algorithm");
                 resetCell();
+                startPoint();
                 offset_angle = ypr[0];
                 targetSpeed = data.substring(1).toInt();
                 time_accelerate = millis();
@@ -61,7 +59,7 @@ void telnetStreamHandle(){
 
             case 'T':
                 TelnetStream.println("Test Encoder Turn");
-                EncoderTurn(data.substring(1).toInt());
+                encoderTurn(data.substring(1).toInt());
                 break;
 
             case 'P':
@@ -100,9 +98,8 @@ void telnetStreamHandle(){
                 break;
 
             case 'g':
-                turnAccelerate = data.substring(1).toFloat();
-                oldErrorP_rotation = 0;
-                TelnetStream.println("turnAccelerate");
+                turnTime = data.substring(1).toFloat();
+                TelnetStream.println("turnTime");
                 break;
 
             case 'h':
@@ -110,14 +107,44 @@ void telnetStreamHandle(){
                 TelnetStream.println("turnSpeed");
                 break;
 
+            case 'k':
+                turnAccelerate = data.substring(1).toFloat();
+                TelnetStream.println("turnAccelerate");
+                break;
+
+            case 'j':
+                startPosAfterTurn = data.substring(1).toFloat();
+                TelnetStream.println("startPosAfterTurn");
+                break;
+
+            case 'v':
+                whellDiameter = data.substring(1).toFloat();
+                TelnetStream.println("whellDiameter");
+                break;
+
             case 'o':
-                forwardWallRatio = data.substring(1).toInt();
-                TelnetStream.println("forwardWallRatio");
+                forwardWallRatioP = data.substring(1).toFloat();
+                TelnetStream.println("forwardWallRatioP");
+                break;
+
+            case 'O':
+                forwardWallRatioD = data.substring(1).toFloat();
+                TelnetStream.println("forwardWallRatioD");
                 break;
 
             case 'i':
                 centerMoveVal = data.substring(1).toInt();
                 TelnetStream.println("centerMoveVal");
+                break;
+
+            case 'L':
+                LED_WARMUP_TIME = data.substring(1).toInt();
+                TelnetStream.println("LED_WARMUP_TIME");
+                break;
+                
+            case 'y':
+                TelnetStream.print(baterryVoltage());
+                TelnetStream.println("vol");
                 break;
 
             case 'F':
@@ -196,7 +223,7 @@ void debugHandle(){
         }
         if(debug == 4){
             TelnetStream.print(" ");
-            TelnetStream.print(rotateError);
+            TelnetStream.print(rotateErrorP);
             TelnetStream.print(" ");
             TelnetStream.print(fw_speed);
             TelnetStream.print(" ");
@@ -212,6 +239,10 @@ void debugHandle(){
         if(debug == 6){
             TelnetStream.print("cPos: ");
             TelnetStream.println(currentPosInCell); 
+        }
+
+        if(debug == 7){
+            TelnetStream.println(rotateErrorP);
         }
 
         if(debug == 10){

@@ -14,22 +14,22 @@ int64_t getAbsPos(){
 }
 
 void setCellPos(long newPos){
-    oldPos = getAbsPos() + newPos;
-    currentPosInCell = 0;
+    oldPos = getAbsPos() - newPos;
+    currentPosInCell = newPos;
 }
 
 void resetCell(){
-    setCellPos(-55);
+    setCellPos(55);
 }
 
 bool updateCellPos(){
     
     //case move forward only
 
-    currentPosInCell =  getAbsPos() - oldPos;
+    currentPosInCell =  (getAbsPos() - oldPos);
     
         //update when enter new cell
-    if(currentPosInCell > CellSize){
+    if(currentPosInCell >= CellSize){
         // currentPosInCell -= CellSize;
         // oldPos = pos;
         setCellPos(0);
@@ -43,3 +43,54 @@ bool updateCellPos(){
 long cellX = 1;
 long cellY = 1;
 
+enum direction {
+    north = 0,
+    east = 1,
+    south = 2,
+    west = 3
+};
+
+int direction = north;
+
+void mazeTurnRight(){
+    direction++;
+    // if(direction > 3 || direction < 0)
+    direction = direction % 4;
+}
+
+void mazeTurnAround(){
+    direction+=2;
+    direction = direction % 4;
+}
+
+void mazeTurnLeft(){
+    direction--;
+    direction = direction % 4;
+}
+
+void startPoint(){
+    cellX = 1;
+    cellY = 1;
+    direction = north;
+}
+
+
+void moveForward(){
+    switch (direction)
+    {
+    case north:
+        cellX++;
+        break;
+    case south:
+        cellX--;
+        break;
+    case east:
+        cellY++;
+        break;
+    case west:
+        cellY--;
+        break;
+    default:
+        break;
+    }
+}

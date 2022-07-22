@@ -78,36 +78,44 @@ bool turning(){
 
 long turningLength = 0.25 * 180 * PI + 40; //141.37166941154069573081895224758
 int64_t accelerateLength = 0;
-int64_t turnLength = 0;
-int64_t turnLengthOld = 0;
-float turnSide = 0.5;
-float turnSpeed = 50; //h20
-float turnAccelerate = 150; //mm/s^2 //g100
-unsigned long timeTurnAccelerate = 0;
+// int64_t turnLength = 0;
+// int64_t turnLengthOld = 0;
+float turnSide = 1;
+
+float turnSpeed = 220; //h20
+float turnAccelerate = 9000; //mm/s^2 //g100
+unsigned long turnTime = 150000; //mc //g100
+
+
+unsigned long accelerateTimer = 0;
+unsigned long keepSpeedTimer = 0;
 int turningPhase = 0;
 
-void EncoderTurn(float side){
+void encoderTurn(float side){
     turnSide = side;
     lastTurn = millis();
     rt_speed = 0;
     turningPhase = 0;
-    turnLengthOld = (encoderA.getCount() + encoderB.getCount())/2;
-    timeTurnAccelerate = millis();
+    // turnLengthOld = (encoderA.getCount() + encoderB.getCount())/2;
+    accelerateTimer = micros();
     if(side > 0)
         gyroTurn(RIGHT);
     else
         gyroTurn(LEFT);
-
-
     // TelnetStream.print(" start turn ");
     
 }
 
+// start ... k ee p ... end
+// 0:0       0 : 1      0:2
+// |---acc---|----|--dec---|
+
+//TODO: Turn to micro for more preside
 void EncoderTurnUpdate(Stream &stream){
     // rt_speed = 0;
-    auto absLength = (encoderA.getCount() + encoderB.getCount())/(int64_t)2;
-    turnLength = absLength - turnLengthOld;
-    turnLengthOld = absLength;
+    // auto absLength = (encoderA.getCount() + encoderB.getCount())/(int64_t)2;
+    // turnLength = absLength - turnLengthOld;
+    // turnLengthOld = absLength;
 
     // stream.print(encoderA.getCount());
     // stream.print(" ");
@@ -116,25 +124,33 @@ void EncoderTurnUpdate(Stream &stream){
 
     //speed up
     if(abs(rt_speed) < turnSpeed && turningPhase == 0){
-        rt_speed += turnSide * ((millis() - timeTurnAccelerate) / 1000.0) * turnAccelerate;
-        accelerateLength = turnLength;
-        stream.print(rt_speed);
-        stream.print(" ");
-        stream.print(accelerateLength);
-        stream.println(" acc");
+        rt_speed += turnSide * ((micros() - accelerateTimer) / 1000000.0) * turnAccelerate;
+        accelerateTimer = micros();
+        keepSpeedTimer = accelerateTimer;
+        // timeTurnAccelerate = accelerateTimer - lastTurn;
+        // accelerateLength = turnLength;
+        // stream.print(rt_speed);
+        // stream.print(" ");
+        // stream.print(accelerateLength);
+        // stream.println(" acc");
     //keep speed
-    }else if (abs(rt_speed) >= turnSpeed && (turningLength - accelerateLength) < turnLength){
-        stream.print(turnLength);
-        stream.println("keep");
-        timeTurnAccelerate = millis();
+    }else if (micros() - keepSpeedTimer < turnTime){
+        // stream.print(millis() - timeTurnAccelerate < turnTime);
+        // stream.println("keep");
+        // timeTurnAccelerate = millis();
+        accelerateTimer = micros();
         turningPhase = 1;
     //speed down
-    }else if (abs(rt_speed) > 15){
+    }else if (turnSide * rt_speed > 0){
         turningPhase = 2;
-        rt_speed  -= turnSide * ((millis() - timeTurnAccelerate) / 1000.0) * turnAccelerate;
-        stream.print(rt_speed);
-        stream.println("dec");
-    }else{
+        rt_speed  -= turnSide * ((micros() - accelerateTimer) / 1000000.0) * turnAccelerate;
+        accelerateTimer = micros();
+        // stream.print(turnSide * rt_speed);
+        // stream.println("dec");
+    }
+    
+    if (turnSide * rt_speed <= 0 && turningPhase == 2) {
+        turningPhase = 3;
         lastTurn = 0; //complete turn
         rt_speed = 0;
         stream.println(" complete turn");

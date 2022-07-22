@@ -7,14 +7,18 @@ float accelerate = 500; //mm/s^2
 unsigned long time_accelerate = 0;
 float realAcc;
 
+void stopMove(){
+    move_enable = false;  
+    targetSpeed = 0;
+    fw_speed = 0;
+    MotorControl.motorsStop();
+}
+
 void hitWallStop(){
     if(frontWall == -1 && move_enable){ // NEARLY HIT THE WALL 
         if(targetSpeed != 0){
             TelnetStream.println("EMERG_STOP");
-            move_enable = false;  
-            targetSpeed = 0;
-            fw_speed = 0;
-            MotorControl.motorsStop();
+            stopMove();
         }
     }
 }
@@ -23,7 +27,7 @@ void gyroMoveAngle(){
     target_angle = - offsetYaw(offset_angle) * E_ratio;
 
     if(abs(target_angle) < 100 && speedA + speedB > 40)
-        rt_speed = 0;
+        rt_speed  = 0;
 
     else if(abs(target_angle) > 700){
         if(target_angle>0)
@@ -35,6 +39,7 @@ void gyroMoveAngle(){
         rt_speed = target_angle;
 }
 
+long startPosAfterTurnAround = 170;
 //process forward and rotating 
 bool movingAlgoUpdate(){
     if (move_enable) {
@@ -43,21 +48,27 @@ bool movingAlgoUpdate(){
             if(turnAround){
                 turnAround = false;
                 targetSpeed = oldTargetSpeed;
-                currentPosInCell = 40;
+                setCellPos(startPosAfterTurnAround);
+                TelnetStream.print("finish turn around");
             }else{
-                gyroMoveAngle(); //use to turn around and forward
+                gyroMoveAngle(); 
             }
         }else{
-            // gyroMoveAngle(); //use gyro for normal turn
-            EncoderTurnUpdate(TelnetStream);
-            time_accelerate = millis();
+            if(turnAround){
+                setPIDRotatingValue();
+                gyroMoveAngle(); //use to turn around and forward
+            }else{
+                // gyroMoveAngle(); //use gyro for normal turn
+                EncoderTurnUpdate(TelnetStream);
+                time_accelerate = millis();
+            }
             return false;
         }
     }
 
 
     //accelerate and calculate the speed
-    if(abs(fw_speed - targetSpeed) > 1){
+    if(abs(fw_speed - targetSpeed) > 3){
         realAcc = ((millis() - time_accelerate) / 1000.0) * accelerate;
         
         if(fw_speed < targetSpeed)
@@ -72,20 +83,18 @@ bool movingAlgoUpdate(){
     return true;
 }
 
-
-
-
 void startRotateAround(){
-    MotorControl.motorsStop();
-    delay(100);
     setPIDRotatingValue();
     gyroTurn(BACKWARD);
+    MotorControl.motorsStop();
+    delay(100);
     turnAround = true;
     oldTargetSpeed = targetSpeed;
     targetSpeed = 0;
     fw_speed = 0; //TODO: using de_accelerate to prevent slip
 }
 
+long startPosAfterTurn = 45;
 
 //right wall move
 void calculateAlgo(){
@@ -94,19 +103,29 @@ void calculateAlgo(){
             printWall(TelnetStream);
             if(!rightWall){
                     // gyroTurn(RIGHT);
-                    EncoderTurn(0.5);
-                    currentPosInCell = 0;
+                    encoderTurn(1);
+                    mazeTurnRight();
+                    // moveForward();
+                    // currentPosInCell = 0;
+                    setCellPos(startPosAfterTurn);
                     TelnetStream.println("Turn RIGHT");
+                    
             }else{
                 if(frontWall == 1){
                     if(!leftWall){
                             // gyroTurn(LEFT);
-                            EncoderTurn(-0.5);
-                            currentPosInCell = 0;
+                            encoderTurn(-1);
+                            mazeTurnLeft();
+                            // moveForward();
+                            // currentPosInCell = 0;
+                            setCellPos(startPosAfterTurn);
                             TelnetStream.println("Turn LEFT");
                     }else{
                         //running rotate sequence
                         startRotateAround();
+                        // setCellPos(startPosAfterTurnAround);
+                        mazeTurnAround();
+                        // moveForward();
                         TelnetStream.println("Turn AROUND");
                     }
                 }

@@ -10,6 +10,10 @@
 #define     SENSOR_PIN_3      34
 #define     SENSOR_PIN_4      35
 #define     SENSOR_PIN_5      32
+
+//BAterry
+#define R2 100
+#define R3 33
 #define     BATTERY_SENSOR      33
 
 
@@ -51,10 +55,13 @@
 // mm per pulse
 // #define MM_PP_A  ((32.15 * PI) / (30 * (50/10) * 4))
 // #define MM_PP_B  ((31.5 * PI) / (30 * (50/10) * 4))
-float a_ratio = 32.15;
+float a_ratio = 1.055;
 
-#define MM_PP_A  ((a_ratio * PI) / (334 * (50/10) * 4))
-#define MM_PP_B  ((31.5 * PI) / (334 * (50/10) * 4))
+// float whellDiameter = 31.5;
+float whellDiameter = 32;
+
+#define MM_PP_A  ((whellDiameter * a_ratio * PI) / (334 * (50/10) * 4))
+#define MM_PP_B  ((whellDiameter * PI) / (334 * (50/10) * 4))
 
 
 // algorithm control

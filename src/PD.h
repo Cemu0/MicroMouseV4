@@ -59,7 +59,7 @@ float D_rotation = 0.73;
 
 //for rotating at position
 void setPIDRotatingValue(){
-    P_rotation = 1.25;
+    P_rotation = 1.12;
     D_rotation = 2.33;
     // P_rotation = 0;
     // D_rotation = 0;
@@ -74,15 +74,15 @@ void setPIDForwardValue(){
 // float P_rotation = 0.5;
 // float D_rotation = 0;
 
-long errorP_speed = 0;
-long errorD_speed = 0;
-long oldErrorP_speed = 0;
-long xError = 0;
+float errorP_speed = 0;
+float errorD_speed = 0;
+float oldErrorP_speed = 0;
+float xError = 0;
 
-long errorP_rotation = 0;
-long errorD_rotation = 0;
-long oldErrorP_rotation = 0;
-long wError = 0;
+float errorP_rotation = 0;
+float errorD_rotation = 0;
+float oldErrorP_rotation = 0;
+float wError = 0;
 
 
 void pdSpeedAngular(const float &xSpeed,const float &wSpeed,const float& rotationError,const float& currentSpeed, 
@@ -104,16 +104,25 @@ void pdSpeedAngular(const float &xSpeed,const float &wSpeed,const float& rotatio
     leftPWM = xError - wError;
 }
 
-long rotateError = 0;
-float forwardWallRatio = 0.3;
-long centerMoveVal = 850;
+long rotateErrorP = 0;
+long oldRotateErrorP = 0;
+float forwardWallRatioP = 0.5;
+float forwardWallRatioD = 0.05;
+
+float errorD_rotate = 0;
+
+long centerMoveVal = 340;
+// long centerMoveVal = 850;
 
 void calculatePD(bool forwardWall = true){
     if(micros() - math_timer > PD_LOOP_TIME){
         if(leftWall == 1 && rightWall == 1){
-            rotateError = faceSensorValue2 - faceSensorValue4 - centerMoveVal;
-            if(forwardWall)
-                rt_speed = rotateError * forwardWallRatio;
+            if(forwardWall && fw_speed > 0){
+                rotateErrorP = faceSensorValue1 - faceSensorValue5 - centerMoveVal;
+                //combine both gyro and side wall 
+                errorD_rotate = rotateErrorP - oldRotateErrorP;
+                rt_speed = rotateErrorP * forwardWallRatioP + errorD_rotate * forwardWallRatioD;
+            }
         }
 
         pdSpeedAngular(fw_speed, rt_speed, ((speedA - speedB) * 2.0), (speedA + speedB) / 2.0, left_pwm, right_pwm);

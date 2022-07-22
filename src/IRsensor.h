@@ -3,20 +3,20 @@
 #include "system_def.h"
 #include "driver/adc.h"
 
-// long LED_WARMUP_TIME = 5;
-#define LED_WARMUP_TIME 80
+long LED_WARMUP_TIME = 5;
+// #define LED_WARMUP_TIME 100
 #define LED_COOLDOWN_TIME 5
 
-#define SIMPLE_FILTER(n, old) ((n + (old * 2))) / (3)
-// #define SIMPLE_FILTER(n, old) (n + old * 0)
+// #define SIMPLE_FILTER(n, old) ((n + (old * 2))) / (3)
+#define SIMPLE_FILTER(n, old) (n + old * 0)
 
 #define PREVENT_ZERO(val) val>=0?val:0
 
 //for 1 and 5
 long collapseFrontWall = 4070;
-long hasFrontWall = 1000;
-long hasLeftWall = 1320;
-long hasRightWall = 1000;
+long hasFrontWall = 100;
+long hasLeftWall = 1950;
+long hasRightWall = 1800;
 #define leftMiddleValue 3500
 #define rightMiddleValue  3400
 
@@ -117,12 +117,27 @@ void readIRsensor(){
         frontWall = faceSensorValue3 > hasFrontWall;
     else 
         frontWall = -1;
+        
 
-    leftWall = faceSensorValue2 > hasLeftWall;
-    
-    rightWall = faceSensorValue4 > hasRightWall;
+    // leftWall = faceSensorValue2 > hasLeftWall;
+    // rightWall = faceSensorValue4 > hasRightWall;
+
+    // leftWall = faceSensorValue1 > 1800;
+    // rightWall = faceSensorValue5 > 1900;
+
+    leftWall = faceSensorValue1 > hasLeftWall;
+    rightWall = faceSensorValue5 > hasRightWall;
 
 }
+/*
+  930: 173
+ 1450: 130
+ 
+*/
+
+// float frontWallDistance(){
+
+// }
 
 void printIR(Stream &stream){
     // stream.print(" ");
@@ -133,6 +148,10 @@ void printIR(Stream &stream){
     stream.print(frontWall);
     stream.print("-");
     stream.print(rightWall);
+    stream.print(" ");
+    stream.print(faceSensorValue2 > hasLeftWall);
+    stream.print("-");
+    stream.print(faceSensorValue4 > hasRightWall);
     stream.print(" ");
     stream.print(faceSensorValue1);
     stream.print(" ");

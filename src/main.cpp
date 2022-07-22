@@ -7,6 +7,7 @@
 #include "OTA.h"
 #include "maze.h"
 #include "algorithm.h"
+#include "baterry.h"
 #include "debug.h"
 
 
@@ -34,14 +35,22 @@ void updateMovement(){
 
     hitWallStop();
     if(updateCellPos()){
-        TelnetStream.println(++cellX);
+        moveForward();
+        TelnetStream.print(cellX);
+        TelnetStream.print(",");
+        TelnetStream.println(cellY);
+
+        if(cellX == 3 && cellY == 3)
+        // if(cellX == 13 && cellY == 2)
+            stopMove();
     // if(updateCellPos()){
         // readIRsensor();
         //when enter new cell 
-        tone(1000,10);
-    calculateAlgo();
+        calculateAlgo();
+        // tone(1000,3);
     };
     calculatePD(movingAlgoUpdate());
+
     motorMove();
 }
 

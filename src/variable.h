@@ -42,7 +42,7 @@ byte debug = 0;
 #define TO_RADIAN(n) (n  * PI) / 180.0
 #define TO_DEG(n) n * (180/PI)
 
-#define TURNING_TIME 9000
+#define TURNING_TIME 1000
 
 unsigned long lastTurn = 0;
 
