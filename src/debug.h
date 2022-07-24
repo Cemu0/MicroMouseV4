@@ -76,14 +76,14 @@ void telnetStreamHandle(){
 
             case 'p':
                 P_rotation = data.substring(1).toFloat();
-                errorP_rotation = 0;
-                TelnetStream.println("P_rotation");
+                P_temp = 0;
+                TelnetStream.println("P_temp");
                 break;
 
             case 'd':
                 D_rotation = data.substring(1).toFloat();
-                errorD_rotation = 0;
-                TelnetStream.println("D_rotation");
+                D_temp = 0;
+                TelnetStream.println("D_temp");
                 break;
 
             case 'E':
@@ -127,21 +127,26 @@ void telnetStreamHandle(){
                 TelnetStream.println("forwardWallRatioP");
                 break;
 
-            // case 'O':
-            //     forwardWallRatioD = data.substring(1).toFloat();
-            //     TelnetStream.println("forwardWallRatioD");
-            //     break;
+            case 'O':
+                turnPosition = data.substring(1).toFloat();
+                TelnetStream.println("turnPosition");
+                break;
 
             case 'i':
-                centerMoveVal = data.substring(1).toInt();
-                TelnetStream.println("centerMoveVal");
+                startPosAfterTurnAround = data.substring(1).toInt();
+                TelnetStream.println("startPosAfterTurnAround");
                 break;
 
             case 'L':
-                LED_WARMUP_TIME = data.substring(1).toInt();
-                TelnetStream.println("LED_WARMUP_TIME");
+                leftMiddleValue = data.substring(1).toInt();
+                TelnetStream.println("leftMiddleValue");
                 break;
                 
+            case 'V':
+                rightMiddleValue = data.substring(1).toInt();
+                TelnetStream.println("rightMiddleValue");
+                break;
+
             case 'y':
                 TelnetStream.print(baterryVoltage());
                 TelnetStream.println("vol");

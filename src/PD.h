@@ -54,6 +54,9 @@
 float P_speed = 0.7;
 float D_speed = 0.4;
 
+float P_temp = 0.165;
+float D_temp = 0.25;
+
 // float P_speed = 0;
 // float D_speed = 0;
 
@@ -84,8 +87,8 @@ void setPIDWallMoveValue(){
 }
 
 void setPIDForwardValue(){
-    P_rotation = 0.25;
-    D_rotation = 0.73;
+    P_rotation = P_temp;
+    D_rotation = D_temp;
     // P_rotation = 0;
     // D_rotation = 0;
 }
@@ -124,26 +127,36 @@ void pdSpeedAngular(const float &xSpeed,const float &wSpeed,const float& rotatio
 
 long rotateErrorP = 0;
 // long oldRotateErrorP = 0;
-float forwardWallRatioP = 0.2;
+float forwardWallRatioP = 0.3;
 // float forwardWallRatioD = 0.05;
 
 // float errorD_rotate = 0;
 
 long centerMoveVal = 340;
-
+long leftMiddleValue = 230;
+long rightMiddleValue = 122;
 // long centerMoveVal = 850;
 
 void calculatePD(bool forwardWall = true){
     if(micros() - math_timer > PD_LOOP_TIME){
-        if(leftWall == 1 && rightWall == 1){
-            if(forwardWall && fw_speed > 0){
+        if(forwardWall && fw_speed > 0){
+            if(leftWall == 1 && rightWall == 1){
                 rotateErrorP = faceSensorValue1 - faceSensorValue5 - centerMoveVal;
                 //combine both gyro and side wall 
                 // errorD_rotate = rotateErrorP - oldRotateErrorP;
-                rt_speed = rotateErrorP * forwardWallRatioP;// + errorD_rotate * forwardWallRatioD;
-                setPIDWallMoveValue();
+                rt_speed += rotateErrorP * forwardWallRatioP;// + errorD_rotate * forwardWallRatioD;
+                // setPIDWallMoveValue();
+            }
+            else if(leftWall == 1)//only has left wall
+            {
+                rt_speed += 2 * (leftMiddleValue - faceSensorValue1) * forwardWallRatioP;
+            }
+            else if(rightWall == 1)//only has right wall
+            {
+                rt_speed += 2 * (faceSensorValue5 - rightMiddleValue) * forwardWallRatioP;
             }
         }
+
 
         pdSpeedAngular(fw_speed, rt_speed, ((speedA - speedB) * 2.0), (speedA + speedB) / 2.0, left_pwm, right_pwm);
         math_timer = micros();

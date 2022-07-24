@@ -3,28 +3,29 @@
 #include "system_def.h"
 #include "driver/adc.h"
 
-long LED_WARMUP_TIME = 5;
+long LED_WARMUP_TIME = 50;
 // #define LED_WARMUP_TIME 100
 #define LED_COOLDOWN_TIME 5
 
-// #define SIMPLE_FILTER(n, old) ((n + (old * 2))) / (3)
-#define SIMPLE_FILTER(n, old) (n + old * 0)
+#define SIMPLE_FILTER(n, old) ((n + (old * 4))) / (5)
+// #define SIMPLE_FILTER(n, old) (n + old * 0)
 
 #define PREVENT_ZERO(val) val>=0?val:0
 
 //for 1 and 5
-long collapseFrontWall = 4070;
-long hasFrontWall = 100;
-long hasLeftWall = 1950;
-long hasRightWall = 1800;
-#define leftMiddleValue 3500
-#define rightMiddleValue  3400
+float collapseFrontWall = 4070;
+float hasFrontWall = 150;
+float hasLeftWall = 500;
+// long hasRightWall = 800; //hmm true but not in case mouse not alight center
+float hasRightWall = 400;
+// #define leftMiddleValue 3500
+// #define rightMiddleValue  3400
 
-long faceSensorValue1 = 0;
-long faceSensorValue2 = 0;
-long faceSensorValue3 = 0;
-long faceSensorValue4 = 0;
-long faceSensorValue5 = 0;
+float faceSensorValue1 = 0;
+float faceSensorValue2 = 0;
+float faceSensorValue3 = 0;
+float faceSensorValue4 = 0;
+float faceSensorValue5 = 0;
 
 // the value that determent when the mouse approach edge
 int frontWall,leftWall,rightWall;
@@ -74,19 +75,8 @@ void readIRsensor(){
     // faceSensorValue4 = thread_value4-analogRead(SENSOR_PIN_4);
     // digitalWrite(SENSOR_ACTIVATE_GROUP_B,LOW);
 
-    digitalWrite(SENSOR_ACTIVATE_GROUP_C,HIGH);
-    delayMicroseconds(LED_WARMUP_TIME); // 100uS
-    faceSensorValue3 = SIMPLE_FILTER((thread_value3-analogRead(SENSOR_PIN_3)),faceSensorValue3);
-    // faceSensorValue3 = ((thread_value3-analogRead(SENSOR_PIN_3)) + faceSensorValue3)/2;
 
-    digitalWrite(SENSOR_ACTIVATE_GROUP_C,LOW);
-    digitalWrite(SENSOR_ACTIVATE_GROUP_A,HIGH);
-    delayMicroseconds(LED_WARMUP_TIME); // 100uS
-    // faceSensorValue5 = SIMPLE_FILTER(PREVENT_ZERO(thread_value5-analogRead(SENSOR_PIN_5)),faceSensorValue5);
-    faceSensorValue5 = SIMPLE_FILTER((thread_value5-analogRead(SENSOR_PIN_5)),faceSensorValue5);
-    // faceSensorValue1 = SIMPLE_FILTER(PREVENT_ZERO(thread_value1-analogRead(SENSOR_PIN_1)),faceSensorValue1);
-    faceSensorValue1 = SIMPLE_FILTER((thread_value1-analogRead(SENSOR_PIN_1)),faceSensorValue1);
-    digitalWrite(SENSOR_ACTIVATE_GROUP_A,LOW);
+
 
     //damn the internal capacitor between sensor 1 and sensor 2 require at least 3 millisecond to cooldown => using 1 or 2 only 
     // delay(3);
@@ -106,11 +96,23 @@ void readIRsensor(){
     // faceSensorValue2 = SIMPLE_FILTER(PREVENT_ZERO(thread_value2-analogRead(SENSOR_PIN_2)),faceSensorValue2);
     faceSensorValue2 = SIMPLE_FILTER((thread_value2-analogRead(SENSOR_PIN_2)),faceSensorValue2);
 
+    digitalWrite(SENSOR_ACTIVATE_GROUP_B,LOW);
+    digitalWrite(SENSOR_ACTIVATE_GROUP_A,HIGH);
+    delayMicroseconds(LED_WARMUP_TIME); // 100uS
+    // faceSensorValue5 = SIMPLE_FILTER(PREVENT_ZERO(thread_value5-analogRead(SENSOR_PIN_5)),faceSensorValue5);
+    faceSensorValue5 = SIMPLE_FILTER((thread_value5-analogRead(SENSOR_PIN_5)),faceSensorValue5);
+    // faceSensorValue1 = SIMPLE_FILTER(PREVENT_ZERO(thread_value1-analogRead(SENSOR_PIN_1)),faceSensorValue1);
+    faceSensorValue1 = SIMPLE_FILTER((thread_value1-analogRead(SENSOR_PIN_1)),faceSensorValue1);
+    digitalWrite(SENSOR_ACTIVATE_GROUP_A,LOW);
 
     // digitalWrite(SENSOR_ACTIVATE_GROUP_A,LOW);
-    digitalWrite(SENSOR_ACTIVATE_GROUP_B,LOW);
-    delayMicroseconds(LED_WARMUP_TIME); // too much time !
+    // delayMicroseconds(LED_WARMUP_TIME); // too much time !
+    digitalWrite(SENSOR_ACTIVATE_GROUP_C,HIGH);
+    delayMicroseconds(LED_WARMUP_TIME); // 100uS
+    faceSensorValue3 = SIMPLE_FILTER((thread_value3-analogRead(SENSOR_PIN_3)),faceSensorValue3);
+    // faceSensorValue3 = ((thread_value3-analogRead(SENSOR_PIN_3)) + faceSensorValue3)/2;
 
+    digitalWrite(SENSOR_ACTIVATE_GROUP_C,LOW);
     // digitalWrite(SENSOR_ACTIVATE_GROUP_C,LOW);
 
     if(faceSensorValue3 < collapseFrontWall)

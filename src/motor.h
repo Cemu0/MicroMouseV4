@@ -82,9 +82,9 @@ int64_t accelerateLength = 0;
 // int64_t turnLengthOld = 0;
 float turnSide = 1;
 
-float turnSpeed = 220; //h20
+float turnSpeed = 450; //h20
 float turnAccelerate = 9000; //mm/s^2 //g100
-unsigned long turnTime = 150000; //mc //g100
+unsigned long turnTime = 530000; //mc //g100
 
 
 unsigned long accelerateTimer = 0;

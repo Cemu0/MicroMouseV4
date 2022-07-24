@@ -1,9 +1,10 @@
 #pragma once
-long turnPosition = 0;
+long turnPosition = 20;
 bool turnAround = false;
 
 float oldTargetSpeed = 200;
-float accelerate = 500; //mm/s^2
+// float accelerate = 500; //mm/s^2
+float accelerate = 900; //mm/s^2
 unsigned long time_accelerate = 0;
 float realAcc;
 
@@ -39,7 +40,7 @@ void gyroMoveAngle(){
         rt_speed = target_angle;
 }
 
-long startPosAfterTurnAround = 170;
+long startPosAfterTurnAround = 140;
 //process forward and rotating 
 bool movingAlgoUpdate(){
     if (move_enable) {
@@ -50,6 +51,9 @@ bool movingAlgoUpdate(){
                 targetSpeed = oldTargetSpeed;
                 setCellPos(startPosAfterTurnAround);
                 TelnetStream.print("finish turn around");
+                //keep up speed
+                MotorControl.motorForward(0, 150);
+                MotorControl.motorForward(1, 150);
             }else{
                 gyroMoveAngle(); 
             }
@@ -86,6 +90,11 @@ bool movingAlgoUpdate(){
 void startRotateAround(){
     setPIDRotatingValue();
     gyroTurn(BACKWARD);
+
+    // MotorControl.motorForward(0, 50);
+    // MotorControl.motorForward(1, 50);
+    // delay(300);
+    
     MotorControl.motorsStop();
     delay(100);
     turnAround = true;
@@ -99,8 +108,8 @@ long startPosAfterTurn = 45;
 //right wall move
 void calculateAlgo(){
     if(move_enable && !turning()){
-        if(currentPosInCell >= turnPosition){
-            printWall(TelnetStream);
+        if(currentPosInCell == turnPosition){
+            printIR(TelnetStream);
             if(!rightWall){
                     // gyroTurn(RIGHT);
                     encoderTurn(1);

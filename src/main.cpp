@@ -32,7 +32,6 @@ void setup(){
 void updateMovement(){
     readIRsensor();
     speedCalculate();
-
     hitWallStop();
     if(updateCellPos()){
         moveForward();
@@ -40,15 +39,15 @@ void updateMovement(){
         TelnetStream.print(",");
         TelnetStream.println(cellY);
 
-        if(cellX == 3 && cellY == 3)
+        if(cellX == 4 && cellY == 4)
         // if(cellX == 13 && cellY == 2)
             stopMove();
     // if(updateCellPos()){
-        // readIRsensor();
         //when enter new cell 
-        calculateAlgo();
-        // tone(1000,3);
+        tone(1000,3);
+        // readIRsensor();
     };
+    // calculateAlgo();
     calculatePD(movingAlgoUpdate());
 
     motorMove();
