@@ -127,10 +127,10 @@ void telnetStreamHandle(){
                 TelnetStream.println("forwardWallRatioP");
                 break;
 
-            case 'O':
-                forwardWallRatioD = data.substring(1).toFloat();
-                TelnetStream.println("forwardWallRatioD");
-                break;
+            // case 'O':
+            //     forwardWallRatioD = data.substring(1).toFloat();
+            //     TelnetStream.println("forwardWallRatioD");
+            //     break;
 
             case 'i':
                 centerMoveVal = data.substring(1).toInt();

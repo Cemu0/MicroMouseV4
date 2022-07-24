@@ -1,44 +1,55 @@
 
 #pragma once
 
-#define P 1
-#define D 1
+// #define WallP 1
+// #define WallD 1
 
-/*
-long errorP = 0;
-long errorD = 0;
-long oldErrorP = 0;
+// long errorP = 0;
+// long errorD = 0;
+// long oldErrorP = 0;
+
+// long centerMoveVal = 340;
+
+// if(leftWall == 1 && rightWall == 1){
+        //     if(forwardWall && fw_speed > 0){
+        //         rotateErrorP = faceSensorValue1 - faceSensorValue5 - centerMoveVal;
+        //         //combine both gyro and side wall 
+        //         errorD_rotate = rotateErrorP - oldRotateErrorP;
+        //         rt_speed = rotateErrorP * forwardWallRatioP + errorD_rotate * forwardWallRatioD;
+        //     }
+        // }
 
 //http://micromouseusa.com/?p=389
-long PID_SENSOR_FORWARD(long &leftSensor, long &rightSensor)       
-{    
-    if((leftSensor > hasLeftWall && rightSensor > hasRightWall))//has both walls
-    {  //ccw direction is positive
-        errorP = rightSensor - leftSensor - 63;//63 is the offset between left and right sensor when mouse in the middle of cell
-        errorD = errorP - oldErrorP;
-    }        
-    else if((leftSensor > hasLeftWall))//only has left wall
-    {
-        errorP = 2 * (leftMiddleValue - leftSensor);
-        errorD = errorP - oldErrorP;
-    }
-    else if((rightSensor > hasRightWall))//only has right wall
-    {
-        errorP = 2 * (rightSensor - rightMiddleValue);
-        errorD = errorP - oldErrorP;
-    }
-    else if((leftSensor < hasLeftWall && rightSensor <hasRightWall))//no wall, use encoder or gyro
-    {
-        errorP = 0;//(leftEncoder - rightEncoder*1005/1000)*3;
-        errorD = 0;
-    }
-    // totalError = P * errorP + D * errorD;
-    return P * errorP + D * errorD;
-    oldErrorP = errorP;
-    // setLeftPwm(leftBaseSpeed - totalError);
-    // setRightPwm(rightBaseSpeed + totalError);    
-}
-*/
+// long PID_SENSOR_FORWARD(long &leftSensor, long &rightSensor)       
+// {    
+//     if((leftSensor > hasLeftWall && rightSensor > hasRightWall))//has both walls
+//     {  //ccw direction is positive
+//         errorP = rightSensor - leftSensor - centerMoveVal;
+//         errorD = errorP - oldErrorP;
+//     }        
+//     else if((leftSensor > hasLeftWall))//only has left wall
+//     {
+//         errorP = 2 * (leftMiddleValue - leftSensor);
+//         errorD = errorP - oldErrorP;
+//     }
+//     else if((rightSensor > hasRightWall))//only has right wall
+//     {
+//         errorP = 2 * (rightSensor - rightMiddleValue);
+//         errorD = errorP - oldErrorP;
+//     }
+
+
+//     // else if((leftSensor < hasLeftWall && rightSensor <hasRightWall))//no wall, use encoder or gyro
+//     // {
+//     //     errorP = 0;//(leftEncoder - rightEncoder*1005/1000)*3;
+//     //     errorD = 0;
+//     // }
+//     totalError = WallP * errorP + WallD * errorD;
+//     // return P * errorP + D * errorD;
+//     // oldErrorP = errorP;
+//     // setLeftPwm(leftBaseSpeed - totalError);
+//     // setRightPwm(rightBaseSpeed + totalError);    
+// }
 
 float P_speed = 0.7;
 float D_speed = 0.4;
@@ -61,6 +72,13 @@ float D_rotation = 0.73;
 void setPIDRotatingValue(){
     P_rotation = 1.12;
     D_rotation = 2.33;
+    // P_rotation = 0;
+    // D_rotation = 0;
+}
+
+void setPIDWallMoveValue(){
+    P_rotation = 0.10;
+    D_rotation = 0.25;
     // P_rotation = 0;
     // D_rotation = 0;
 }
@@ -105,13 +123,14 @@ void pdSpeedAngular(const float &xSpeed,const float &wSpeed,const float& rotatio
 }
 
 long rotateErrorP = 0;
-long oldRotateErrorP = 0;
-float forwardWallRatioP = 0.5;
-float forwardWallRatioD = 0.05;
+// long oldRotateErrorP = 0;
+float forwardWallRatioP = 0.2;
+// float forwardWallRatioD = 0.05;
 
-float errorD_rotate = 0;
+// float errorD_rotate = 0;
 
 long centerMoveVal = 340;
+
 // long centerMoveVal = 850;
 
 void calculatePD(bool forwardWall = true){
@@ -120,8 +139,9 @@ void calculatePD(bool forwardWall = true){
             if(forwardWall && fw_speed > 0){
                 rotateErrorP = faceSensorValue1 - faceSensorValue5 - centerMoveVal;
                 //combine both gyro and side wall 
-                errorD_rotate = rotateErrorP - oldRotateErrorP;
-                rt_speed = rotateErrorP * forwardWallRatioP + errorD_rotate * forwardWallRatioD;
+                // errorD_rotate = rotateErrorP - oldRotateErrorP;
+                rt_speed = rotateErrorP * forwardWallRatioP;// + errorD_rotate * forwardWallRatioD;
+                setPIDWallMoveValue();
             }
         }
 
