@@ -54,8 +54,8 @@
 float P_speed = 0.7;
 float D_speed = 0.4;
 
-float P_temp = 0.165;
-float D_temp = 0.25;
+float P_temp = 0.265;
+float D_temp = 0.35;
 
 // float P_speed = 0;
 // float D_speed = 0;
@@ -140,7 +140,7 @@ float forwardWallRatioP = 0.17;
 
 long centerMoveVal = 540;
 long leftMiddleValue = 2533;
-long rightMiddleValue = 2450;
+long rightMiddleValue = 2250;
 // long rightMiddleValue = 3510;
 
 long calculatePD(bool forwardWall = true){

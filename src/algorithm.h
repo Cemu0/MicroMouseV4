@@ -41,8 +41,8 @@ void gyroMoveAngle(){
 }
 
 // long startPosAfterTurn = 53; //j60
-long startPosAfterTurn = 125; //j60
-long startPosAfterTurnAround = 75;//i
+long startPosAfterTurn = 125; //j125
+long startPosAfterTurnAround = 75;//i75
 //process forward and rotating 
 bool movingAlgoUpdate(){
     if (move_enable) {
@@ -93,7 +93,7 @@ bool movingAlgoUpdate(){
 
 // long perpendicularCalibrateValue = 0;
 long setPointFrontValue = 3550; //~9cm
-float calibrateForwardValue = -1.5F; //Z
+float calibrateForwardValue = -0.5F; //Z
 float calibrateRotateValue = 2.02F; // z
 unsigned long calibrateTimer;
 
@@ -123,8 +123,8 @@ void calibrateFrontWall(){
         //calibrate wall only
         pdSpeedAngular(0, 0, -target_angle, fw_speed, left_pwm, right_pwm); 
 
-        limitAbs(left_pwm, 70L);
-        limitAbs(right_pwm, 70L);
+        limitAbs(left_pwm, 60L);
+        limitAbs(right_pwm, 60L);
 
 
             // left_pwm = fw_speed;
@@ -153,9 +153,9 @@ void startRotateAround(){
     setPIDRotatingValue();
     gyroTurn(BACKWARD);
 
-    MotorControl.motorForward(0, 80);
-    MotorControl.motorReverse(1, 80);
-    delay(70);
+    MotorControl.motorForward(1, 80);
+    MotorControl.motorReverse(0, 80);
+    delay(90);
     
     // MotorControl.motorsStop();
     // delay(100);

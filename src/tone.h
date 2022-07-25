@@ -36,10 +36,10 @@ void readyTone(){
 
 void stopTone(){
     tone(1000,100);
-    delay(200);
-    tone(2000,100);
-    delay(200);
-    tone(3000,100);
+    delay(1000);
+    tone(1000,100);
+    delay(1000);
+    tone(1000,100);
 }
 
 void startTone(){

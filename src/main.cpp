@@ -50,6 +50,11 @@ void updateMovement(){
             stopMove();
             successTone();
         }
+
+        if(cellX == 1 && cellY == 1){
+            stopMove();
+            stopTone();
+        }
     // if(updateCellPos()){
         //when enter new cell 
         tone(1000,3);
@@ -64,7 +69,7 @@ void updateMovement(){
 
 void loop(){
     if(!move_enable){
-        if(faceSensorValue4 > 4000 && faceSensorValue2 > 4000){
+        if(faceSensorValue4 > 4000 && faceSensorValue2 > 4000 && frontWall == 0){
             startTone();
             startRun();
         }
