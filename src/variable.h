@@ -42,7 +42,7 @@ byte debug = 0;
 #define TO_RADIAN(n) (n  * PI) / 180.0
 #define TO_DEG(n) n * (180/PI)
 
-#define TURNING_TIME 1000
+#define TURNING_TIME 1500
 
 unsigned long lastTurn = 0;
 
@@ -53,3 +53,5 @@ unsigned long LOG_timer = 0;
 
 float ypr[3];   
 float delta;
+
+// TODO: MOVE EVERYTHING HERE?

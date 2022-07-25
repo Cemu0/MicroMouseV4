@@ -1,13 +1,19 @@
+#include "helperFunctions.h"
 #include "variable.h"
 #include "tone.h"
 #include "IRsensor.h"
-#include "PD.h"
 #include "motor.h"
+#include "maze.h"
+#include "PD.h"
 #include "MPU.h" 
 #include "OTA.h"
-#include "maze.h"
 #include "algorithm.h"
 #include "baterry.h"
+
+//our target
+int stopX = 1;
+int stopY = 6;
+
 #include "debug.h"
 
 
@@ -39,21 +45,30 @@ void updateMovement(){
         TelnetStream.print(",");
         TelnetStream.println(cellY);
 
-        if(cellX == 4 && cellY == 4)
-        // if(cellX == 13 && cellY == 2)
+        // if(cellX == 4 && cellY == 4)
+        if(cellX == stopX && cellY == stopY){
             stopMove();
+            successTone();
+        }
     // if(updateCellPos()){
         //when enter new cell 
         tone(1000,3);
         // readIRsensor();
     };
-    // calculateAlgo();
+    calculateAlgo();
+
     calculatePD(movingAlgoUpdate());
 
     motorMove();
 }
 
 void loop(){
+    if(!move_enable){
+        if(faceSensorValue4 > 4000 && faceSensorValue2 > 4000){
+            startTone();
+            startRun();
+        }
+    }
     buildInLedOn();
     entry = micros();
     ws.cleanupClients(1);

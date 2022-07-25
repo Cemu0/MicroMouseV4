@@ -41,3 +41,28 @@ void stopTone(){
     delay(200);
     tone(3000,100);
 }
+
+void startTone(){
+    tone(1000,100);
+    delay(1000);
+    tone(2000,100);
+    delay(1000);
+    tone(3000,100);
+    delay(1000);
+    tone(5000,100);
+
+}
+
+void successTone(){
+    tone(3000,100);
+    delay(200);
+    tone(2000,100);
+    delay(200);
+    tone(3000,100);
+    delay(500);
+    tone(3000,100);
+    delay(200);
+    tone(2000,100);
+    delay(200);
+    tone(3000,100);
+}

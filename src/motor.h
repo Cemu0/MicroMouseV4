@@ -76,15 +76,15 @@ bool turning(){
     return millis() - lastTurn < TURNING_TIME;
 }
 
-long turningLength = 0.25 * 180 * PI + 40; //141.37166941154069573081895224758
+// long turningLength = 0.25 * 180 * PI + 40; //141.37166941154069573081895224758
 int64_t accelerateLength = 0;
 // int64_t turnLength = 0;
 // int64_t turnLengthOld = 0;
 float turnSide = 1;
 
-float turnSpeed = 450; //h20
-float turnAccelerate = 9000; //mm/s^2 //g100
-unsigned long turnTime = 530000; //mc //g100
+float turnSpeed = 1500; //h20
+float turnAccelerate = 18500; //mm/s^2 //k100
+unsigned long turnTime = 95000; //mc //g100
 
 
 unsigned long accelerateTimer = 0;
@@ -111,7 +111,7 @@ void encoderTurn(float side){
 // |---acc---|----|--dec---|
 
 //TODO: Turn to micro for more preside
-void EncoderTurnUpdate(Stream &stream){
+bool EncoderTurnUpdate(Stream &stream){
     // rt_speed = 0;
     // auto absLength = (encoderA.getCount() + encoderB.getCount())/(int64_t)2;
     // turnLength = absLength - turnLengthOld;
@@ -154,25 +154,36 @@ void EncoderTurnUpdate(Stream &stream){
         lastTurn = 0; //complete turn
         rt_speed = 0;
         stream.println(" complete turn");
+        return true;
     }
+
+    return false;
     
 }
 
 void motorMove(){
     if(move_enable){
+
+        // if(abs(left_pwm) < 40){
+        //     left_pwm = 0;
+        // }
+        // if(abs(right_pwm) < 40){
+        //     right_pwm = 0;
+        // }
+
         if(left_pwm > 0){
-            left_pwm+=30;
+            // left_pwm+=30; //left motor week !
             MotorControl.motorForward(0, left_pwm);
-        }else{
-            left_pwm-=30;
+        }else{ // if(left_pwm < 0)
+            // left_pwm-=30;
             MotorControl.motorReverse(0, -left_pwm);
         }
 
         if(right_pwm > 0){
-            right_pwm+=30;
+            // right_pwm+=30;
             MotorControl.motorForward(1, right_pwm);
-        }else{
-            right_pwm-=30;
+        }else{ // if(left_pwm < 0)
+            // right_pwm-=30;
             // right -= E_ratio;
             MotorControl.motorReverse(1, -right_pwm);
         }

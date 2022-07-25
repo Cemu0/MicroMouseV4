@@ -7,14 +7,18 @@ long LED_WARMUP_TIME = 50;
 // #define LED_WARMUP_TIME 100
 #define LED_COOLDOWN_TIME 5
 
-#define SIMPLE_FILTER(n, old) ((n + (old * 4))) / (5)
+#define SIMPLE_FILTER(n, old) ((n + (old * 4.0F))) / (5.0F)
 // #define SIMPLE_FILTER(n, old) (n + old * 0)
+
+//value to determent haves wall or not
+// #define HAVE_WALL_COUNTER 5
+
 
 #define PREVENT_ZERO(val) val>=0?val:0
 
 //for 1 and 5
-float collapseFrontWall = 4070;
-float hasFrontWall = 150;
+float collapseFrontWall = 4090;
+float hasFrontWall = 180;
 float hasLeftWall = 500;
 // long hasRightWall = 800; //hmm true but not in case mouse not alight center
 float hasRightWall = 400;
@@ -28,6 +32,7 @@ float faceSensorValue4 = 0;
 float faceSensorValue5 = 0;
 
 // the value that determent when the mouse approach edge
+int frontWallCounter,leftWallCounter,rightWallCounter;
 int frontWall,leftWall,rightWall;
 
 // #define analogReads1 adc1_get_raw(ADC1_CHANNEL_0)
@@ -40,17 +45,25 @@ void initIR(){
 	// config.pull_down_en = GPIO_PULLDOWN_DISABLE;
 	// config.intr_type = GPIO_INTR_DISABLE;
 	// gpio_config(&config);
+    adcAttachPin(SENSOR_PIN_1);
+    adcAttachPin(SENSOR_PIN_2);
+    adcAttachPin(SENSOR_PIN_3);
+    adcAttachPin(SENSOR_PIN_4);
+    adcAttachPin(SENSOR_PIN_5);
 
+    analogReadResolution(12); //12 bits
     // analogSetAttenuation(ADC_11db);
+    analogSetClockDiv(16);
     // analogSetWidth(10);
+
 
     //not need using pin mode
 
-    // pinMode(SENSOR_PIN_1,INPUT);
-    // pinMode(SENSOR_PIN_2,INPUT);
-    // pinMode(SENSOR_PIN_3,INPUT);
-    // pinMode(SENSOR_PIN_4,INPUT);
-    // pinMode(SENSOR_PIN_5,INPUT);
+    // pinMode(SENSOR_PIN_1,INPUT_PULLDOWN);
+    // pinMode(SENSOR_PIN_2,INPUT_PULLDOWN);
+    // pinMode(SENSOR_PIN_3,INPUT_PULLDOWN);
+    // pinMode(SENSOR_PIN_4,INPUT_PULLDOWN);
+    // pinMode(SENSOR_PIN_5,INPUT_PULLDOWN);
 
     pinMode(SENSOR_ACTIVATE_GROUP_A,OUTPUT);
     pinMode(SENSOR_ACTIVATE_GROUP_B,OUTPUT);
@@ -61,11 +74,11 @@ void initIR(){
 }
 
 void readIRsensor(){
-    long thread_value1 = analogRead(SENSOR_PIN_1);// - ThdVal1; adc1_get_raw(ADC1_CHANNEL_0);
-    long thread_value2 = analogRead(SENSOR_PIN_2);// - ThdVal2; adc1_get_raw(ADC1_CHANNEL_3);
-    long thread_value3 = analogRead(SENSOR_PIN_3);// - ThdVal3;
-    long thread_value4 = analogRead(SENSOR_PIN_4);// - ThdVal4;
-    long thread_value5 = analogRead(SENSOR_PIN_5);// - ThdVal5;
+    float thread_value1 = analogRead(SENSOR_PIN_1);// - ThdVal1; adc1_get_raw(ADC1_CHANNEL_0);
+    float thread_value2 = analogRead(SENSOR_PIN_2);// - ThdVal2; adc1_get_raw(ADC1_CHANNEL_3);
+    float thread_value3 = analogRead(SENSOR_PIN_3);// - ThdVal3;
+    float thread_value4 = analogRead(SENSOR_PIN_4);// - ThdVal4;
+    float thread_value5 = analogRead(SENSOR_PIN_5);// - ThdVal5;
 
     // LED_WARMUP_TIME = (millis()%10000)/100;
 

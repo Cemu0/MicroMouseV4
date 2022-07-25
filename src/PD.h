@@ -73,20 +73,26 @@ float D_rotation = 0.73;
 
 //for rotating at position
 void setPIDRotatingValue(){
-    P_rotation = 1.12;
-    D_rotation = 2.33;
+    P_rotation = 0.82;
+    D_rotation = 2.23;
     // P_rotation = 0;
     // D_rotation = 0;
 }
 
-void setPIDWallMoveValue(){
-    P_rotation = 0.10;
-    D_rotation = 0.25;
+void setPIDCalibrateValue(){
+    P_speed = P_temp;
+    D_speed = D_temp;
+
+    P_rotation = 1.10;
+    D_rotation = 2.05;
     // P_rotation = 0;
     // D_rotation = 0;
 }
 
 void setPIDForwardValue(){
+    P_speed = 0.7;
+    D_speed = 0.4;
+
     P_rotation = P_temp;
     D_rotation = D_temp;
     // P_rotation = 0;
@@ -127,38 +133,45 @@ void pdSpeedAngular(const float &xSpeed,const float &wSpeed,const float& rotatio
 
 long rotateErrorP = 0;
 // long oldRotateErrorP = 0;
-float forwardWallRatioP = 0.3;
+float forwardWallRatioP = 0.17;
 // float forwardWallRatioD = 0.05;
 
 // float errorD_rotate = 0;
 
-long centerMoveVal = 340;
-long leftMiddleValue = 230;
-long rightMiddleValue = 122;
-// long centerMoveVal = 850;
+long centerMoveVal = 540;
+long leftMiddleValue = 2533;
+long rightMiddleValue = 2450;
+// long rightMiddleValue = 3510;
 
-void calculatePD(bool forwardWall = true){
+long calculatePD(bool forwardWall = true){
     if(micros() - math_timer > PD_LOOP_TIME){
-        if(forwardWall && fw_speed > 0){
+        if(forwardWall && fw_speed > 0 && (currentPosInCell < 140)){ //
             if(leftWall == 1 && rightWall == 1){
                 rotateErrorP = faceSensorValue1 - faceSensorValue5 - centerMoveVal;
                 //combine both gyro and side wall 
                 // errorD_rotate = rotateErrorP - oldRotateErrorP;
-                rt_speed += rotateErrorP * forwardWallRatioP;// + errorD_rotate * forwardWallRatioD;
+                rt_speed = rotateErrorP * forwardWallRatioP;// + errorD_rotate * forwardWallRatioD;
                 // setPIDWallMoveValue();
+
+                //update back to the gyro value ???
+                if(abs(rotateErrorP) < 3)
+                    offset_angle += (offset_angle - ypr[0] ) * 0.00005;
             }
-            else if(leftWall == 1)//only has left wall
+            else if(leftWall == 1)
             {
-                rt_speed += 2 * (leftMiddleValue - faceSensorValue1) * forwardWallRatioP;
+                rt_speed = (faceSensorValue1 - leftMiddleValue) * forwardWallRatioP;
             }
-            else if(rightWall == 1)//only has right wall
+            else if(rightWall == 1)
             {
-                rt_speed += 2 * (faceSensorValue5 - rightMiddleValue) * forwardWallRatioP;
+                rt_speed = (rightMiddleValue - faceSensorValue5) * forwardWallRatioP;
             }
+
+            //update back the gyro
         }
 
-
-        pdSpeedAngular(fw_speed, rt_speed, ((speedA - speedB) * 2.0), (speedA + speedB) / 2.0, left_pwm, right_pwm);
+        //1.7 due to lack of forward speed
+        pdSpeedAngular(fw_speed, rt_speed, ((speedA - speedB) * 2.0), (speedA + speedB) / 4.0, left_pwm, right_pwm);
         math_timer = micros();
+        return rt_speed;
     }
 }

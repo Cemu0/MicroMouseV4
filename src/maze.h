@@ -63,8 +63,10 @@ void mazeTurnAround(){
     direction = direction % 4;
 }
 
-void mazeTurnLeft(){
+void mazeTurnLeft(){ //wrong
     direction--;
+    if(direction < 0)
+        direction = 3;
     direction = direction % 4;
 }
 

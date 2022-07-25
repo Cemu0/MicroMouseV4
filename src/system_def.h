@@ -58,7 +58,7 @@
 float a_ratio = 1.055;
 
 // float whellDiameter = 31.5;
-float whellDiameter = 32;
+float whellDiameter = 30.9;
 
 #define MM_PP_A  ((whellDiameter * a_ratio * PI) / (334 * (50/10) * 4))
 #define MM_PP_B  ((whellDiameter * PI) / (334 * (50/10) * 4))

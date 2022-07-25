@@ -16,6 +16,16 @@ void checkRunningOnCore(){
     Serial.println(xPortGetCoreID());
 }
 
+void startRun(){
+    TelnetStream.println("Start Algorithm");
+    resetCell();
+    startPoint();
+    offset_angle = ypr[0];
+    targetSpeed = 200;
+    time_accelerate = millis();
+    move_enable = true;
+}
+
 void telnetStreamHandle(){
         while(TelnetStream.available()){
         String data = TelnetStream.readStringUntil('\n');
@@ -75,14 +85,14 @@ void telnetStreamHandle(){
                 break;
 
             case 'p':
-                P_rotation = data.substring(1).toFloat();
-                P_temp = 0;
+                // P_rotation = data.substring(1).toFloat();
+                P_temp = data.substring(1).toFloat();
                 TelnetStream.println("P_temp");
                 break;
 
             case 'd':
-                D_rotation = data.substring(1).toFloat();
-                D_temp = 0;
+                // D_rotation = data.substring(1).toFloat();
+                D_temp = data.substring(1).toFloat();
                 TelnetStream.println("D_temp");
                 break;
 
@@ -141,13 +151,41 @@ void telnetStreamHandle(){
                 leftMiddleValue = data.substring(1).toInt();
                 TelnetStream.println("leftMiddleValue");
                 break;
+
+            case 'x':
+                stopX = data.substring(1).toInt();
+                TelnetStream.println("stopX");
+                break;
+
+            case 'y':
+            
+                stopY = data.substring(1).toInt();
+                TelnetStream.println("stopY");
+                break;
+
+            case 'Z':
+                calibrateForwardValue = data.substring(1).toFloat();
+                TelnetStream.println("calibrateForwardValue");
+                break;
+            
+            case 'z':
+                calibrateRotateValue = data.substring(1).toFloat();
+                TelnetStream.println("calibrateRotateValue");
+                break;
+
+            case 'M':
+                move_enable = true;
+                calibrateFrontWall();
+                move_enable = false;
+                TelnetStream.print("done ");
+                break;
                 
             case 'V':
                 rightMiddleValue = data.substring(1).toInt();
                 TelnetStream.println("rightMiddleValue");
                 break;
 
-            case 'y':
+            case 'Y':
                 TelnetStream.print(baterryVoltage());
                 TelnetStream.println("vol");
                 break;
@@ -233,7 +271,6 @@ void debugHandle(){
             TelnetStream.print(fw_speed);
             TelnetStream.print(" ");
             TelnetStream.println(rt_speed);
-            
         }
 
         if(debug == 5){
