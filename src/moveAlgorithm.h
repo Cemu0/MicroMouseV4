@@ -153,9 +153,10 @@ void startRotateAround(){
     setPIDRotatingValue();
     gyroTurn(BACKWARD);
 
-    MotorControl.motorForward(1, 80);
+    //warning 2 motor have different stress
+    MotorControl.motorForward(1, 45);
     MotorControl.motorReverse(0, 80);
-    delay(90);
+    delay(100);
     
     // MotorControl.motorsStop();
     // delay(100);

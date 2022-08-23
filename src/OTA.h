@@ -1,4 +1,5 @@
 #define CONFIG_ESP32_WIFI_TASK_PINNED_TO_CORE_1 1
+
 #include <esp_wifi.h>
 #include <Arduino.h>
 #include <ESPmDNS.h>
@@ -15,13 +16,12 @@
 
 #include <TelnetStream.h>
 
-
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 int Xvalue = 0, Yvalue = 0;
 
 //note you should turn on and off wifiHotspot 
-void connectWifi(const char* ssid, const char* password){
+bool connectWifi(const char* ssid, const char* password){
     WiFi.disconnect();
     esp_wifi_disconnect();
     esp_wifi_stop();
@@ -35,13 +35,20 @@ void connectWifi(const char* ssid, const char* password){
       Serial.println("ConnectingWIFI..."); 
       delay(1000);
     };
+
     if(WiFi.status() != WL_CONNECTED){
     // while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-        Serial.println("Connection Failed! Rebooting...");
-        delay(100);
-        ESP.restart();
+        // Serial.println("Connection Failed! Rebooting...");
+        // delay(100);
+        // ESP.restart();
+
+        
+        Serial.println("Connection Failed! Skip");
+        return false;
     // }
     }
+    return true;
+
 }
 
 void handle_message(String msg) {

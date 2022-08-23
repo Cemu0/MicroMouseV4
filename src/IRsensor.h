@@ -32,7 +32,7 @@ float faceSensorValue4 = 0;
 float faceSensorValue5 = 0;
 
 // the value that determent when the mouse approach edge
-int frontWallCounter,leftWallCounter,rightWallCounter;
+// int frontWallCounter,leftWallCounter,rightWallCounter;
 int frontWall,leftWall,rightWall;
 
 // #define analogReads1 adc1_get_raw(ADC1_CHANNEL_0)

@@ -73,7 +73,7 @@ float D_rotation = 0.73;
 
 //for rotating at position
 void setPIDRotatingValue(){
-    P_rotation = 0.82;
+    P_rotation = 1.82;
     D_rotation = 2.23;
     // P_rotation = 0;
     // D_rotation = 0;

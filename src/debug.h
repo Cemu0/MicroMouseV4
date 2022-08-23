@@ -1,14 +1,21 @@
 #pragma once
 
-void initDebug(){
+bool initDebug(){
     Serial.begin(115200);
     Serial.println("Connecting ... ");
-    connectWifi(ssid,password);
-    setupServer();
-    Serial.println("HTTP server started");
-    Serial.println("Ready");
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+    if(connectWifi(ssid,password)){
+        setupServer();
+        Serial.println("HTTP server started");
+        Serial.println("Ready");
+        Serial.print("IP address: ");
+        Serial.println(WiFi.localIP());
+        return true;
+    }
+    else{
+        esp_wifi_stop();
+        stopTone();
+        return false;
+    }
 }
 
 void checkRunningOnCore(){

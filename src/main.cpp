@@ -7,10 +7,10 @@
 #include "PD.h"
 #include "MPU.h" 
 #include "OTA.h"
-#include "algorithm.h"
+#include "moveAlgorithm.h"
 #include "baterry.h"
 
-//our target
+//our target point
 int stopX = 1;
 int stopY = 6;
 
