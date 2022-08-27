@@ -6,9 +6,9 @@ Source with video instruction ... on making process
 ## INSTALLATION
 1. Clone this repo
 2. Open it in VSCode and install PlatformIO (vsc should recommend you install it) 
-3. Now you should able to build the code. By defaul 
+3. Now you should able to build the code. By default 
 ## USAGE
-Due to many config and 
+After connect with the mouse using telnet to control the mouse. Check code or video for more detail
 
 ## REFERENCE:
 [1] Green Ye - [Project Futura](http://micromouseusa.com/?page_id=1342)  
