@@ -1,5 +1,5 @@
 # ViMicroMouse 
-## INTRODUCTION
+![Micromouse](images/Overview.png)
 This is the source code of the ViMicroMouse robot. Design and Made in Viet Nam, We are trying to create a cheap robot for use in lab and hope fully in local competition.  
 You can see the Robot run with this Code at [HERE](https://youtu.be/DZiLTkW6-m4).
 ## INSTALLATION
@@ -10,6 +10,8 @@ You can see the Robot run with this Code at [HERE](https://youtu.be/DZiLTkW6-m4)
 After connect with the mouse using telnet to control the mouse.   
 More detail [here (Manual_vi.md)](Manual_vi.md) (only Vietnamese version available)  
 Check the code ... or [my youtube chanel](https://www.youtube.com/channel/UC28B70ToFInzz8yKEcRnYIQ) for more detail =) 
+
+![](images/mouses.jpg)
 
 ## REFERENCE
 [1] Green Ye - [Project Futura](http://micromouseusa.com/?page_id=1342)  
